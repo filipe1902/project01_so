@@ -19,5 +19,23 @@ sincronizar_arquivos() {
             echo "Arquivo $arquivo atualizado."
         fi
     done
+}
+
+remover_arquivos_inexistentes() {
+
+    echo "A remover arquivos e diretórias inexistentes..."
+
+    find "$BACKUP" -type f | while read -r arquivo
+    do
+        origem="$ORIGEM/${arquivo#BACKUP}"
+        
+        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
+        then                        # Caso não exista, irá eliminá-lo da do backup tambem
+            rm "$arquivo"
+            echo "Arquivo eliminado: $arquivo"
+        fi
+    done
+
+    find "$BACKUP" -type d -empty -delete    
 
 }
