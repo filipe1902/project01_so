@@ -2,20 +2,20 @@
 
 # Função para verificar permissões
 verificar_permissoes() {
-    permissao_ok=true
+    permissao_certa=true
 
-    if [ ! -r "$ORIGEM" ]; then
-        echo "Permissão de leitura negada para a diretoria de origem: '$ORIGEM'."
-        permissao_ok=false
+    if [ ! -r "$ORIGEM" ]; then #Verifica se a diretório de origem ($ORIGEM) não tem permissão de leitura (-r). Se não tiver, exibe uma mensagem de erro e define permissao_certa como false
+        echo "Read permission denied for the source directory: '$ORIGEM'."
+        permissao_certa=false
     fi
 
-    if [ ! -w "$BACKUP" ]; then
-        echo "Permissão de escrita negada para a diretoria de backup: '$BACKUP'."
-        permissao_ok=false
+    if [ ! -w "$BACKUP" ]; then #Verifica se o diretório de backup ($BACKUP) não tem permissão de escrita (-w). Se não tiver, exibe uma mensagem de erro e define permissao_certa como false.
+        echo "Write permission denied for the backup directory: '$BACKUP'."
+        permissao_certa=false
     fi
 
-    # Se não houver problema de permissões, retorne verdadeiro
-    if [ "$permissao_ok" = true ]; then
+    #Se permissao_certa for true, a função retorna 0 (sucesso). Caso contrário, retorna 1 (falha).
+    if [ "$permissao_certa" = true ]; then
         return 0
     else
         return 1
@@ -24,20 +24,20 @@ verificar_permissoes() {
 
 # Função para alterar permissões
 corrigir_permissoes() {
-    if [ ! -r "$ORIGEM" ]; then
-        echo "Alterando permissões de leitura para a diretoria de origem: '$ORIGEM'."
+    if [ ! -r "$ORIGEM" ]; then #Altera as permissões de leitura e escrita. Se o diretório de origem ($ORIGEM) não tiver permissão de leitura, exibe uma mensagem e usa chmod +r para adicionar a permissão de leitura
+        echo "Changing read permissions for the source directory: '$ORIGEM'."
         chmod +r "$ORIGEM"
     fi
 
-    if [ ! -w "$BACKUP" ]; then
-        echo "Alterando permissões de escrita para a diretoria de backup: '$BACKUP'."
+    if [ ! -w "$BACKUP" ]; then #Se o diretório de backup ($BACKUP) não tiver permissão de escrita, exibe uma mensagem e usa chmod +w para adicionar a permissão de escrita
+        echo "Changing write permissions for the backup directory: '$BACKUP'."
         chmod +w "$BACKUP"
     fi
 }
 
 # Verifica se o script recebeu os diretórios de origem e destino como parâmetros
-if [ "$#" -ne 2 ]; then
-    echo "Uso: $0 <diretoria_origem> <diretoria_backup>"
+if [ "$#" -ne 2 ]; then #Verifica se o script recebeu exatamente dois parâmetros (diretoria de origem e diretoria de backup). Se não recebeu, exibe uma mensagem de uso correto e sai com código de erro 1
+    echo "Usage: $0 <diretoria_origem> <diretoria_backup>"
     exit 1
 fi
 
@@ -47,10 +47,10 @@ BACKUP="$2"
 
 # Verifica se há permissões corretas
 if ! verificar_permissoes; then
-    echo "Há problemas de permissões."
+    echo "There are permission issues."
 
     # Pergunta ao usuário se ele deseja corrigir as permissões
-    read -p "Deseja alterar as permissões automaticamente? (s/n): " resposta
+    read -p "Do you want to automatically change the permissions? (y/n): " resposta
 
     if [[ "$resposta" =~ ^[sS]$ ]]; then
         # Se o usuário aceitar, corrigir as permissões
@@ -58,16 +58,16 @@ if ! verificar_permissoes; then
 
         # Verificar permissões novamente após a correção
         if ! verificar_permissoes; then
-            echo "As permissões ainda não estão corretas. Verifique manualmente."
+            echo "Permissions are still not correct. Please check manually."
             exit 2
         fi
     else
-        echo "Por favor, ajuste as permissões e execute o script novamente."
+        echo "Please adjust the permissions and run the script again."
         exit 2
     fi
 fi
 
 # Se tudo estiver OK, continue com o resto do script
-echo "Permissões corretas. Continuando com o backup..."
+echo "Permissions are correct. Continuing with the backup..."
 
 # Coloque aqui o restante do código de backup
