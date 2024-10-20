@@ -21,7 +21,7 @@ sincronizar_arquivos() {
     done
 }
 
-remover_arquivos_inexistentes() {
+remover_arquivos_inexistentes() { #objetivo: remover arquivos e diretórios que já não existem na origem, mas ainda estão presentes no diretório de backup
 
     echo "A remover arquivos e diretórias inexistentes..."
 
