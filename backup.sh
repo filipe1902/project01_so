@@ -26,7 +26,18 @@ fi
 
 if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
 then
-    echo "Verifica as permissões de escrita no backup ou as permissões de leitura na origem"
+    echo "Erro nas permissões:"
+
+    if [ ! -w "$BACKUP" ]
+    then
+        echo "- A diretoria de backup '$BACKUP' não tem permissões de escrita. Use o comando 'chmod' para conceder permissões."
+    if
+
+    if [ ! -r "$ORIGEM" ]
+    then
+        echo "- A diretoria de origem '$ORIGEM' não tem permissões de leitura. Verifique e ajuste as permissões."
+    fi
+
     exit 2
 fi
 
