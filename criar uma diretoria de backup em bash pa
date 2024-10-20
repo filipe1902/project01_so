@@ -1,8 +1,0 @@
-criar uma diretoria de backup em bash para guardar ficheiros e pastas
-
-quando o script for executado, tem que receber dois parametros - source e backup
-
-na primeira vez que é executado, copia tudo do src, cria o backup e cola tudo la
-
-apos a primeira vez, todas as vezes que for executado apenas os novos ou 
-modificados devem ser passados
