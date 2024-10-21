@@ -10,25 +10,11 @@ sincronizar_arquivos() {
         # Manipula o valor da variavel arquivo para ser o caminho do backup
         backup="$BACKUP/${arquivo#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do arquivo pelo caminho do backup
 
-        if [ -e "$backup" ] && [ "$backup" -nt "$arquivo" ]
-        then
-            echo "WARNING: backup entry $backup is newer than $arquivo; Should not happen"
-            AVISOS=$(($AVISOS + 1))
-        fi
-
         # Verifica se o ficheiro existe ou o arquivo é mais recente que o backup
         if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]       # '-nt' = newer than
         then    
-            mkdir -p $(dirname $backup)     # dirname e um comando que estrai o caminho da diretoria do ficheiro destino
-            echo "mkdir -p $(dirname $backup)"
-
             cp -a "$arquivo" "$backup"      # faz a copia do arquivo preservando todos os atributos (-a)  
             echo "cp -a $arquivo $backup"
-
-            # Atualiza o contador e tamanho de ficheiros copiados
-            FILE_SIZE=$(stat --format="%s" "$arquivo")  #stat recebe a informação do ficheiro / --format indica o stat para dar como
-                                                        #output apenas o tamanho do ficheiro (em bytes)
-            if [ ! -e ]
 
             echo "File $arquivo updated."
         fi
