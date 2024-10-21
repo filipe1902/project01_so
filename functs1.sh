@@ -3,7 +3,7 @@
 sincronizar_arquivos() {
 
     local CHECK=$1          # Atribui o primeiro argumento passado à função a uma variavel local 
-
+    
     echo "Sincronizing new files and modified ones..."
 
     # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel arquivo
