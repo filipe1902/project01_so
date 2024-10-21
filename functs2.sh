@@ -17,7 +17,6 @@ sincronizar_arquivos() {
         backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
 
         # Verifica se o ficheiro existe ou o item é mais recente que o backup
-           
         if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
         then                        
             if [[ "$CHECK" == true ]]       # Verifica se está no modo checking
