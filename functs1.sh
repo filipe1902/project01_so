@@ -2,8 +2,8 @@
 
 sincronizar_arquivos() {
 
-    local CHECK=$1
-
+    local CHECK=$1          # Atribui o primeiro argumento passado à função a uma variavel local 
+    
     echo "Sincronizing new files and modified ones..."
 
     # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel arquivo
@@ -19,7 +19,7 @@ sincronizar_arquivos() {
             then
                 echo "cp -a $arquivo $backup"            
             else
-                cp -a "$arquivo" "$backup"      # faz a copia do arquivo preservando todos os atributos (-a)  
+                cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
                 echo "cp -a $arquivo $backup"
 
                 echo "File $arquivo updated."
