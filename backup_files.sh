@@ -21,36 +21,17 @@ fi
 if [ ! -d "$BACKUP" ]
 then
     echo "The backup directory does not exist. Creating one..."
-    echo "mkdir -p $BACKUP"
     mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
+    echo "mkdir -p $BACKUP"
 fi
 
 if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
 then
-    echo "Erro nas permissões:"
-
-    if [ ! -w "$BACKUP" ]
-    then
-        echo "- A diretoria de backup '$BACKUP' não tem permissões de escrita. Use o comando 'chmod' para conceder permissões."
-    if
-
-    if [ ! -r "$ORIGEM" ]
-    then
-        echo "- A diretoria de origem '$ORIGEM' não tem permissões de leitura. Verifique e ajuste as permissões."
-    fi
-
+    echo "Verifica as permissões de escrita no backup ou as permissões de leitura na origem"
     exit 2
 fi
 
-source ./functs.sh
-
-ERROS=0
-AVISOS=0
-COPIAS=0
-ATUALIZS=0
-APAGADOS=0
-SIZE_COPIED=0
-SIZE_DELETED=0
+source ./functs1.sh
 
 sincronizar_arquivos
 remover_arquivos_inexistentes
