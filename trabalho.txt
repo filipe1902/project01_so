@@ -1,0 +1,38 @@
+olá sid
+
+Tópicos:
+
+- Escrever na consola todos os comandos de cópia e criação de diretorias
+
+- Assinalar com mensagens apropriadas todos os comandos que não decorreram como espera, por exemplo,
+backup ser mais recente que origem, problemas com permissões, etc (ver output possivel no pdf)
+
+- O script terá sempre dois parametros <origem> <backup>
+
+- Parametros adicionais:
+    -c : é usado para ativar a opção checking onde aparece todos os comandos na consola mas não executa nenhum
+    -b : permite indicação de um ficheiro de texto que contem uma lista de ficheiros ou diretorias que não devem ser copiados
+    -r : indica que apenas ficheiros que verificam uma regex devem ser copiados
+
+
+1º Ponto - backup_files.sh
+    - source apenas tem ficheiros (não tem diretorias nem subdiretorias)
+    - permite usar apenas o comando -c
+    - apenas atualiza ficheiros com data de modificação posteriores à do backup
+
+2º Ponto - backup.sh
+    - parecido com o primeiro mas
+    - pode ter diretorias e subdiretorias
+    - deve usar todos os comandos adicionais (-c -b -r)
+    - deve invocar backup.sh recursivamente para cada diretoria verificada
+
+3º Ponto - backup_summary.sh
+    - parecido ao anterior
+    - para cada diretoria faz um sumário com o numero de erros, aviso, ficheiros atualizados, copiados e apagados
+
+4º Ponto - backup_check.sh
+    - verifica se o conteudo dos ficheiros no backup são iguais ao conteudo dos ficheiros do source usando o comando
+    "md5sum"
+    - não tem que fazer verificações de ficheiros novos ou fazer copiados
+    - sempre que houver erro deve ser escrita uma mensagem identica a 
+    "src/text.txt bak1/text.txt differ."
