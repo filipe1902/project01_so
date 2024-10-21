@@ -27,7 +27,7 @@ fi
 
 if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
 then
-    echo "Verifica as permissões de escrita no backup ou as permissões de leitura na origem"
+    echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
