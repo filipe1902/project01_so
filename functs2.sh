@@ -39,31 +39,32 @@ sincronizar_arquivos() {
 # Função para remover arquivos e diretórios que não existem mais na origem
 remover_arquivos_inexistentes() {
 
-    local source_dir="$1"   # 
-    local backup_dir="$2"
-    local check="$3"
+    local source_dir="$1"   # diretório de origem como 1 arg
+    local backup_dir="$2"   # diretório de backup como 2 arg
+    local check="$3"        # flag de simulacao como 3 arg
 
-    for backup_item in "$backup_dir"/*; do
-        local item_name=$(basename "$backup_item")
-        local source_item="$source_dir/$item_name"
+    # itera sobre todos os itens (arquivos e diretorios) no diretório de backup
+    for backup_item in "$backup_dir"/*; do 
+        local item_name=$(basename "$backup_item") # obtém o nome do item (arquivo ou diretório)
+        local source_item="$source_dir/$item_name"  # defini caminho correspondente no diretório de origem
 
-        if [ -d "$backup_item" ]; then  # Se for um diretório
-            if [ ! -d "$source_item" ]; then
-                if [[ "$check" == true ]]; then
-                    echo "Simulação: rm -r $backup_item"
+        if [ -d "$backup_item" ]; then  # se o item for um diretório
+            if [ ! -d "$source_item" ]; then    # se o diretório correspondente na origem não existir
+                if [[ "$check" == true ]]; then # se estiver em modo simulacao
+                    echo "Simulação: rm -r $backup_item"    # exibe a acao que seria executada
                 else
-                    rm -r "$backup_item" && echo "rm -r $backup_item"
+                    rm -r "$backup_item" && echo "rm -r $backup_item"   #remove o diretório no backup e exibe a acao
                 fi
             else
-                # Chama a função recursivamente para verificar o conteúdo do subdiretório
+                # chama a função recursivamente para verificar o conteúdo do subdiretório
                 remover_arquivos_inexistentes "$source_item" "$backup_item" "$check"
             fi
-        elif [ -f "$backup_item" ]; then  # Se for um arquivo
-            if [ ! -f "$source_item" ]; then
-                if [[ "$check" == true ]]; then
-                    echo "Simulação: rm $backup_item"
+        elif [ -f "$backup_item" ]; then  # se o item for um arquivo
+            if [ ! -f "$source_item" ]; then    # se o arquivo correspondente na origem não existir 
+                if [[ "$check" == true ]]; then # se estiver em modo de simulacao
+                    echo "Simulação: rm $backup_item"   # exibe a acao que seria tomada
                 else
-                    rm "$backup_item" && echo "rm $backup_item"
+                    rm "$backup_item" && echo "rm $backup_item" # remove o arquivo no backup e exibe a acao
                 fi
             fi
         fi
