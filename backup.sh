@@ -41,13 +41,11 @@ fi
 if [ ! -d "$BACKUP" ]
 then
     echo "The backup directory does not exist. Creating one..."
-    if [[ "$CHECK" == true ]]
+    if [[ "$CHECK" == false ]]
     then
-        echo "mkdir -p $BACKUP"
-    else
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
-        echo "mkdir -p $BACKUP"
     fi
+    echo "mkdir -p $BACKUP"
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)

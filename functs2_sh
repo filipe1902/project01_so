@@ -20,29 +20,22 @@ sincronizar_arquivos() {
            
         if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
         then                        
-            if [[ "$CHECK" == true ]]       # Verifica se está no modo checking
+            if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
             then
-                echo "mkdir -p $backup"
-            else    
-                mkdir -p $backup
-                echo "mkdir -p $backup"
-                echo "Directory created: $backup"
+                mkdir -p $backup    
             fi
+            echo "mkdir -p $backup"
 
             # Chama se a si própria recursivamente
-            ./backup.sh ${CHECK:+-c} ${DELETE_LIST:+-b "$DELETE_LIST"} ${REGEX:+-r "$REGEX"} "$item" "$backup"
+            sincronizar_arquivos ${CHECK:+-c} ${DELETE_LIST:+-b "$DELETE_LIST"} ${REGEX:+-r "$REGEX"} "$item" "$backup"
         else
             if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
             then 
-                if [[ "$CHECK" == true ]]
+                if [[ "$CHECK" == false ]]
                 then
-                    echo "cp -a $arquivo $backup"            
-                else
-                    cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
-                    echo "cp -a $arquivo $backup"
-
-                    echo "File $arquivo updated."
+                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
                 fi
+                echo "cp -a $item $backup"
             fi   
         fi
     done
@@ -60,14 +53,11 @@ remover_arquivos_inexistentes() {
         
         if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
         then                        # Caso não exista, irá eliminá-lo da do backup tambem
-            if [[ "$CHECK" == true ]]
+            if [[ "$CHECK" == false ]]
             then
-                echo "rm $arquivo"
-            else
-                rm "$arquivo"
-                echo "rm $arquivo"
-                echo "File deleted: $arquivo"
+            	rm "$arquivo"     
             fi
+            echo "rm $arquivo"
         fi
     done 
 }

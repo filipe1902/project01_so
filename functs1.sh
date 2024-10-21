@@ -15,15 +15,11 @@ sincronizar_arquivos() {
         # Verifica se o ficheiro existe ou o arquivo é mais recente que o backup
         if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]       # '-nt' = newer than
         then    
-            if [[ "$CHECK" == true ]]
+            if [[ "$CHECK" == false ]]
             then
-                echo "cp -a $arquivo $backup"            
-            else
                 cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
-                echo "cp -a $arquivo $backup"
-
-                echo "File $arquivo updated."
             fi
+            echo "cp -a $arquivo $backup"
         fi
     done
 }
@@ -40,14 +36,11 @@ remover_arquivos_inexistentes() {
         
         if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
         then                        # Caso não exista, irá eliminá-lo da do backup tambem
-            if [[ "$CHECK" == true ]]
+            if [[ "$CHECK" == false ]]
             then
-                echo "rm $arquivo"
-            else
                 rm "$arquivo"
-                echo "rm $arquivo"
-                echo "File deleted: $arquivo"
             fi
+            echo "rm $arquivo"
         fi
     done 
 }
