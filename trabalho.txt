@@ -16,11 +16,10 @@ backup ser mais recente que origem, problemas com permissões, etc (ver output p
 
 
 1º Ponto - backup_files.sh
-    - source apenas tem ficheiros (não tem diretorias nem subdiretorias)
-    - permite usar apenas o comando -c
-    - apenas atualiza ficheiros com data de modificação posteriores à do backup
-    (para testar, dar backup numa pasta com um ficheiro de texto e uma pasta com um ficheiro de texto, e verificar
-    apenas se apenas vao os ficheiros)
+    - source apenas tem ficheiros (não tem diretorias nem subdiretorias)        ///// done
+    - permite usar apenas o comando -c                                          ///// done
+    - apenas atualiza ficheiros com data de modificação posteriores à do backup ///// done
+    
 
 2º Ponto - backup.sh
     - parecido com o primeiro mas

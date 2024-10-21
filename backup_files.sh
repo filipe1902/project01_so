@@ -1,10 +1,22 @@
 #!/bin/bash
 
 # Verifica se o utilizador introduziu exatamente dois argumentos
-if [ $# -ne 2 ]     # '$#' indica o número de argumentos passados para o script 
+if [ $# -lt 2 ] || [ $# -gt 3 ]     # '$#' indica o número de argumentos passados para o script 
 then
-    echo "Usage: $0 <source.directory> <backup.directory>"
+    echo "Usage: $0 [-c] <source.directory> <backup.directory>"
     exit 1
+fi
+
+# Verifica se o primeiro argumento é '-c'
+CHECK=false
+if [[ $# -e 3 ]] && [[ "$1" == "-c" ]] 
+then
+    CHECK=true
+    ORIGEM="$2"
+    BACKUP="$3"
+else
+    ORIGEM="$1"
+    BACKUP="$2"
 fi
 
 ORIGEM="$1"
@@ -21,10 +33,17 @@ fi
 if [ ! -d "$BACKUP" ]
 then
     echo "The backup directory does not exist. Creating one..."
-    mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
-    echo "mkdir -p $BACKUP"
+    
+    if [[ "$CHECK" == true ]]
+    then
+        echo "mkdir -p $BACKUP"
+    else
+        mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
+        echo "mkdir -p $BACKUP"
+    fi
 fi
 
+# Verifica as permissões
 if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
@@ -33,7 +52,7 @@ fi
 
 source ./functs1.sh
 
-sincronizar_arquivos
-remover_arquivos_inexistentes
+sincronizar_arquivos "$CHECK"
+remover_arquivos_inexistentes "$CHECK"
 
 echo "Backup done!"
