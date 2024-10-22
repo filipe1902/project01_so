@@ -30,24 +30,27 @@ sincronizar_arquivos() {
 
 remover_arquivos_inexistentes() {
 
-    local CHECK=$1
+    local CHECK=$1  # Atribui o primeiro argumento passado à função a uma variável local
 
     echo "Removing non-existing files..."
 
-    find "$BACKUP" -maxdepth 1 -type f | while read -r arquivo
-    do
-        origem="$ORIGEM/${arquivo#BACKUP}"
-        
-        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
-        then                        # Caso não exista, irá eliminá-lo da do backup tambem
-            if [[ "$CHECK" == true ]]
-            then
-                echo "rm $arquivo"
+    # Procura arquivos no diretório de backup
+    find "$BACKUP" -type f | while read -r arquivo; do
+    
+        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
+        origem="$ORIGEM/${arquivo#$BACKUP/}"
+
+        # Verifica se o arquivo correspondente na origem não existe
+        if [ ! -e "$origem" ]; then
+            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
+                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
             else
-                rm "$arquivo"
-                echo "rm $arquivo"
-                echo "File deleted: $arquivo"
+                rm "$arquivo"  # Remove o arquivo no backup
+                echo "File deleted: $arquivo"  # Exibe a ação realizada
             fi
         fi
-    done 
+    done
+
+    # Remove diretórios vazios no backup
+    find "$BACKUP" -type d -empty -delete
 }
