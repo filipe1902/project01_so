@@ -2,9 +2,6 @@
 
 sincronizar_arquivos() {
 
-    
-    echo "Sincronizing new files and modified ones..."
-
     # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel arquivo
     find "$ORIGEM" -maxdepth 1 -type f | while read -r arquivo      
     do  
@@ -14,23 +11,16 @@ sincronizar_arquivos() {
         # Verifica se o ficheiro existe ou o arquivo é mais recente que o backup
         if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]       # '-nt' = newer than
         then    
-            if [[ "$CHECK" == true ]]
+            if [[ "$CHECK" == false ]]
             then
-                echo "cp -a $arquivo $backup"            
-            else
                 cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
-                echo "cp -a $arquivo $backup"
-
-                echo "File $arquivo updated."
             fi
+            echo "cp -a $arquivo $backup"
         fi
     done
 }
 
 remover_arquivos_inexistentes() {
-
-
-    echo "Removing non-existing files..."
 
     # Procura arquivos no diretório de backup
     find "$BACKUP" -type f | while read -r arquivo; do
@@ -40,12 +30,10 @@ remover_arquivos_inexistentes() {
 
         # Verifica se o arquivo correspondente na origem não existe
         if [ ! -e "$origem" ]; then
-            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
-                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
-            else
+            if [[ "$CHECK" == false ]]; then  # Se estiver em modo de simulação
                 rm "$arquivo"  # Remove o arquivo no backup
-                echo "File deleted: $arquivo"  # Exibe a ação realizada
             fi
+            echo "m "$arquivo""  # Exibe a ação realizada
         fi
     done
 
@@ -86,19 +74,21 @@ then
     echo "The source directory does not exist."
     exit 1
 fi
-
 # Verifica se o backup não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$BACKUP" ]
+
+
 then
     echo "The backup directory does not exist. Creating one..."
-    if [[ "$CHECK" == true ]]
+    if [[ "$CHECK" == false ]]
     then
-        echo "mkdir -p $BACKUP"
-    else
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
-        echo "mkdir -p $BACKUP"
     fi
+    echo "mkdir -p $BACKUP"
 fi
+
+sincronizar_arquivos
+remover_arquivos_inexistentes
 
 # Verifica as permissões (escrita no backup e leitura na origem)
 if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
@@ -108,7 +98,7 @@ then
 fi
 
 
-sincronizar_arquivos
-remover_arquivos_inexistentes
+#sincronizar_arquivos
+#remover_arquivos_inexistentes
 
 echo "Backup done!"

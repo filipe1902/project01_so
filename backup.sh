@@ -5,8 +5,93 @@ usage() {
     exit 1
 }
 
+sincronizar_arquivos() {
+
+    
+
+    echo "Sincronizing new files and modified ones..."
+
+    excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
+
+    # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
+    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]]
+    then
+        while IFS= read -r line || [ -n "$line" ]
+        do
+            excluded_files+=($line)
+        done < "$EXCLUDE_LIST"
+    fi
+
+    # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel item
+    find "$ORIGEM" -type d -o -type f | while read -r item
+    do
+
+#        # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
+#        if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
+#        then
+#            continue
+#        fi
+#
+#        # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
+#        if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
+#        then
+#           continue
+#        fi
+
+        # Manipula o valor da variavel item para ser o caminho do backup
+        backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
+
+        # Verifica se o ficheiro existe ou o item é mais recente que o backup
+        if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
+        then                        
+            if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
+            then
+                mkdir -p $backup    
+            fi
+            echo "mkdir -p $backup"
+
+            # Chama se a si própria recursivamente
+            #sincronizar_arquivos ${CHECK:+-c} ${EXCLUDE_LIST:+-b "$EXCLUDE_LIST"} ${REGEX:+-r "$REGEX"} "$item" "$backup"
+        else
+            if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
+            then 
+                if [[ "$CHECK" == false ]]
+                then
+                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
+                fi
+                echo "cp -a $item $backup"
+            fi   
+        fi
+    done
+}
+
+remover_arquivos_inexistentes() {
+
+    echo "Removing non-existing files..."
+
+    # Procura arquivos no diretório de backup
+    find "$BACKUP" -type f | while read -r arquivo; do
+    
+        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
+        origem="$ORIGEM/${arquivo#$BACKUP/}"
+
+        # Verifica se o arquivo correspondente na origem não existe
+        if [ ! -e "$origem" ]; then
+            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
+                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
+            else
+                rm "$arquivo"  # Remove o arquivo no backup
+                echo "File deleted: $arquivo"  # Exibe a ação realizada
+            fi
+        fi
+    done
+
+    # Remove diretórios vazios no backup
+    find "$BACKUP" -type d -empty -delete
+}
+
 CHECK=false # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
-DELETE_LIST=""
+EXCLUDE_LIST=""
 REGEX=""
                                         # : atrás é uma convenção usada para lidar com erros em bash de forma efetiva
                                         # todos os comandos seguido de um : indica que recebe argumentos
@@ -14,7 +99,7 @@ while getopts ":cb:r:" opt              # getopts é uma utilidade built in que 
 do
     case "$opt" in
         c) CHECK=true ;;
-        b) DELETE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
+        b) EXCLUDE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
         r) REGEX="$OPTARG" ;;
         *) usage;;                      
     esac
@@ -41,13 +126,11 @@ fi
 if [ ! -d "$BACKUP" ]
 then
     echo "The backup directory does not exist. Creating one..."
-    if [[ "$CHECK" == true ]]
+    if [[ "$CHECK" == false ]]
     then
-        echo "mkdir -p $BACKUP"
-    else
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
-        echo "mkdir -p $BACKUP"
     fi
+    echo "mkdir -p $BACKUP"
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
@@ -57,9 +140,9 @@ then
     exit 2
 fi
 
-source ./functs2.sh
 
-sincronizar_arquivos "$CHECK" "$DELETE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
-remover_arquivos_inexistentes "$CHECK" "$DELETE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
+sincronizar_arquivos 
+# remover_arquivos_inexistentes 
 
 echo "Backup done!"
+
