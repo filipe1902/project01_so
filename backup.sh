@@ -7,10 +7,6 @@ usage() {
 
 sincronizar_arquivos() {
 
-    
-
-    echo "Sincronizing new files and modified ones..."
-
     excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
 
     # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
@@ -26,17 +22,17 @@ sincronizar_arquivos() {
     find "$ORIGEM" -type d -o -type f | while read -r item
     do
 
-#        # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
-#        if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
-#        then
-#            continue
-#        fi
-#
-#        # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
-#        if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
-#        then
-#           continue
-#        fi
+        # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
+        if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
+        then
+            continue
+        fi
+
+        # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
+        if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
+        then
+           continue
+        fi
 
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
@@ -66,8 +62,6 @@ sincronizar_arquivos() {
 }
 
 remover_arquivos_inexistentes() {
-
-    echo "Removing non-existing files..."
 
     # Procura arquivos no diretório de backup
     find "$BACKUP" -type f | while read -r arquivo; do
@@ -134,7 +128,7 @@ then
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
-if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
+if ([ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
@@ -142,7 +136,10 @@ fi
 
 
 sincronizar_arquivos 
-# remover_arquivos_inexistentes 
+if [[ -e "$BACKUP" ]]
+then
+    remover_arquivos_inexistentes
+fi
 
 echo "Backup done!"
 
