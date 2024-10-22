@@ -1,5 +1,49 @@
 #!/bin/bash
 
+sincronizar_arquivos() {
+    
+    echo "Sincronizing new files and modified ones..."
+
+    # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel arquivo
+    find "$ORIGEM" -maxdepth 1 -type f | while read -r arquivo      
+    do  
+        # Manipula o valor da variavel arquivo para ser o caminho do backup
+        backup="$BACKUP/${arquivo#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do arquivo pelo caminho do backup
+
+        # Verifica se o ficheiro existe ou o arquivo é mais recente que o backup
+        if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]       # '-nt' = newer than
+        then    
+            if [[ "$CHECK" == false ]]
+            then
+                cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
+            fi
+            echo "cp -a $arquivo $backup"
+        fi
+    done
+}
+
+remover_arquivos_inexistentes() {
+
+    echo "Removing non-existing files..."
+
+    find "$BACKUP" -maxdepth 1 -type f | while read -r arquivo
+    do
+        origem="$ORIGEM/${arquivo#BACKUP}"
+        
+        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
+        then                        # Caso não exista, irá eliminá-lo da do backup tambem
+            if [[ "$CHECK" == false ]]
+            then
+                rm "$arquivo"
+            fi
+            echo "rm $arquivo"
+        fi
+    done
+
+    # Remove diretórios vazios no backup
+    find "$BACKUP" -type d -empty -delete
+}
+
 # Verifica se o utilizador introduziu menos de dois ou mais que 3 argumentos
 if [ $# -lt 2 ] || [ $# -gt 3 ]     # '$#' indica o número de argumentos passados para o script 
 then
@@ -38,7 +82,6 @@ fi
 if [ ! -d "$BACKUP" ]
 then
     echo "The backup directory does not exist. Creating one..."
-    l
     if [[ "$CHECK" == false ]]
     then
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
@@ -53,9 +96,7 @@ then
     exit 2
 fi
 
-source ./functs1.sh
-
-sincronizar_arquivos "$CHECK"
-remover_arquivos_inexistentes "$CHECK"
+sincronizar_arquivos
+#remover_arquivos_inexistentes
 
 echo "Backup done!"

@@ -12,7 +12,7 @@ sincronizar_arquivos() {
     excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
 
     # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
-    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST"]]
+    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]]
     then
         while IFS= read -r line || [ -n "$line" ]
         do
@@ -21,8 +21,8 @@ sincronizar_arquivos() {
     fi
 
     # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel item
-    find "$ORIGEM" -type d -o -type f | while read -r item      
-    do  
+    find "$ORIGEM" -type d -o -type f | while read -r item
+    do
 
         # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
         if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
@@ -32,6 +32,9 @@ sincronizar_arquivos() {
 
         # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
         if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
+        then
+            continue
+        fi
 
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
@@ -129,12 +132,9 @@ then
     exit 2
 fi
 
-source ./functs2.sh
 
 sincronizar_arquivos 
 remover_arquivos_inexistentes 
 
 echo "Backup done!"
-
-
 

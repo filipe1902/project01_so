@@ -13,7 +13,7 @@ sincronizar_arquivos() {
     excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
 
     # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
-    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST"]]
+    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]]
     then
         while IFS= read -r line || [ -n "$line" ]
         do
@@ -33,6 +33,9 @@ sincronizar_arquivos() {
 
         # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
         if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
+        then
+            continue
+        fi
 
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
