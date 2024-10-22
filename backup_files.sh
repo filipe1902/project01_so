@@ -103,4 +103,3 @@ if [[ -e "$BACKUP" ]]
 then
     remover_arquivos_inexistentes
 fi
-
