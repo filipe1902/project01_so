@@ -87,18 +87,20 @@ then
     echo "mkdir -p $BACKUP"
 fi
 
-sincronizar_arquivos
-remover_arquivos_inexistentes
 
 # Verifica as permissões (escrita no backup e leitura na origem)
-if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
+if ([ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
 
-#sincronizar_arquivos
-#remover_arquivos_inexistentes
+sincronizar_arquivos
 
-echo "Backup done!"
+#ver se existe backup
+if [[ -e "$BACKUP" ]]
+then
+    remover_arquivos_inexistentes
+fi
+
