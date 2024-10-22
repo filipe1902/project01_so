@@ -16,7 +16,7 @@ then
     BACKUP="$3"
 
 # Caso o primeiro argumento não seja '-c', sai do programa
-elif [[ $# -eq 3]] && [[ "$1" != "-c" ]]
+elif [[ $# -eq 3 ]] && [[ "$1" != "-c" ]]
 then
     echo "Usage: $0 [-c] <source.directory> <backup.directory>"
     exit 1

@@ -26,7 +26,7 @@ sincronizar_arquivos() {
 
 remover_arquivos_inexistentes() {
 
-    local CHECK=$1
+    local CHECK=$1  # Atribui o primeiro argumento passado à função a uma variável local
 
     echo "Removing non-existing files..."
 
@@ -42,5 +42,8 @@ remover_arquivos_inexistentes() {
             fi
             echo "rm $arquivo"
         fi
-    done 
+    done
+
+    # Remove diretórios vazios no backup
+    find "$BACKUP" -type d -empty -delete
 }
