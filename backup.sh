@@ -6,7 +6,7 @@ usage() {
 }
 
 CHECK=false # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
-DELETE_LIST=""
+EXCLUDE_LIST=""
 REGEX=""
                                         # : atrás é uma convenção usada para lidar com erros em bash de forma efetiva
                                         # todos os comandos seguido de um : indica que recebe argumentos
@@ -14,7 +14,7 @@ while getopts ":cb:r:" opt              # getopts é uma utilidade built in que 
 do
     case "$opt" in
         c) CHECK=true ;;
-        b) DELETE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
+        b) EXCLUDE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
         r) REGEX="$OPTARG" ;;
         *) usage;;                      
     esac
@@ -57,7 +57,7 @@ fi
 
 source ./functs2.sh
 
-sincronizar_arquivos "$CHECK" "$DELETE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
-remover_arquivos_inexistentes "$CHECK" "$DELETE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
+sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
+remover_arquivos_inexistentes "$CHECK" "$ORIGEM" "$BACKUP"
 
 echo "Backup done!"

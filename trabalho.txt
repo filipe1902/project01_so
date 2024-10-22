@@ -24,7 +24,7 @@ backup ser mais recente que origem, problemas com permissões, etc (ver output p
 2º Ponto - backup.sh            
     - parecido com o primeiro mas                                               ///// done
     - pode ter diretorias e subdiretorias                                       ///// done   
-    - deve usar todos os comandos adicionais (-c -b -r) 
+    - deve usar todos os comandos adicionais (-c -b -r)                         ///// done
     - deve invocar backup.sh recursivamente para cada diretoria verificada      ///// done
 
 3º Ponto - backup_summary.sh
