@@ -52,14 +52,12 @@ sincronizar_arquivos() {
                 then
                     mkdir $backup 
                 fi
-                #echo "mkdir ${backup#"$(dirname $BACKUP)/"}"
+                echo "mkdir ${backup#"$(dirname $BACKUPOG)/"}"
             fi
 
             # Chama se a si própria recursivamente
-            echo "BASENAME $BACKUP $(basename $item)"
             sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
-            BACKUP="${BACKUP%"$(basename $item)"}"
-            echo "BASENAME2 $BACKUP"
+
         else
             if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
             then 
@@ -122,7 +120,7 @@ if [ $# -ne 2 ]; then
 fi
 
 ORIGEM="$1"
-BACKUP="$2"
+BACKUPOG="$2"
 
 # Verifica se a origem não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$ORIGEM" ]
@@ -132,24 +130,24 @@ then
 fi
 
 # Verifica se o backup não é uma diretoria e consequencialmente se não existe
-if [ ! -d "$BACKUP" ]
+if [ ! -d "$BACKUPOG" ]
 then
     if [[ "$CHECK" == false ]]
     then
-        mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
+        mkdir -p "$BACKUPOG"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
     fi
-    echo "mkdir ${BACKUP#*/}"
+    echo "mkdir ${BACKUPOG#*/}"
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
-if ([ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
+if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
 
-sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
+sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUPOG"
 #if [[ -e "$BACKUP" ]]
 #then
     #remover_arquivos_inexistentes
