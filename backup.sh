@@ -22,7 +22,7 @@ sincronizar_arquivos() {
     # find para procurar por diretórios (-type d) e arquivos (-type f) na diretoria de origem ("$ORIGEM"). Os resultados da busca são passados, um por um, para o loop while read -r item, onde item é o caminho completo de cada diretório ou arquivo encontrado.
     find "$ORIGEM" -type d -o -type f | while read -r item
     do
-
+        
         # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
         #if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
         #then
@@ -50,21 +50,24 @@ sincronizar_arquivos() {
             then                   
                 if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
                 then
-                    mkdir -p $backup 
+                    mkdir $backup 
                 fi
-                echo "mkdir -p $backup"
+                #echo "mkdir ${backup#"$(dirname $BACKUP)/"}"
             fi
 
             # Chama se a si própria recursivamente
+            echo "BASENAME $BACKUP $(basename $item)"
             sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
+            BACKUP="${BACKUP%"$(basename $item)"}"
+            echo "BASENAME2 $BACKUP"
         else
             if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
             then 
                 if [[ "$CHECK" == false ]]
                 then
-                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
+                    cp -a "$item" "$backup}"      # Faz a copia do item preservando todos os atributos (-a)  
                 fi
-                echo "cp -a $item $backup"
+                #echo "cp -a $item $backup"
             fi   
         fi
     done
@@ -128,7 +131,6 @@ then
     exit 1
 fi
 
-
 # Verifica se o backup não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$BACKUP" ]
 then
@@ -136,7 +138,7 @@ then
     then
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
     fi
-    echo "mkdir -p $BACKUP"
+    echo "mkdir ${BACKUP#*/}"
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
@@ -153,4 +155,3 @@ sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
     #remover_arquivos_inexistentes
 #fi
 
-echo "Backup done!"
