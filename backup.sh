@@ -19,10 +19,8 @@ sincronizar_arquivos() {
     #    done < "$EXCLUDE_LIST"
     #fi #lista dos excluded_files com os nomes que não queremos copiar para o backup
 
-    # find para procurar por diretórios (-type d) e arquivos (-type f) na diretoria de origem ("$ORIGEM"). Os resultados da busca são passados, um por um, para o loop while read -r item, onde item é o caminho completo de cada diretório ou arquivo encontrado.
-    find "$ORIGEM" -type d -o -type f | while read -r item
-    do
-        
+    for item in $ORIGEM/*; do 
+
         # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
         #if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
         #then
@@ -43,6 +41,7 @@ sincronizar_arquivos() {
             continue
         fi  
 
+            
         # Verifica se o ficheiro existe ou o item é mais recente que o backup
         if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
         then
@@ -58,14 +57,15 @@ sincronizar_arquivos() {
             # Chama se a si própria recursivamente
             sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
 
-        else
+        elif [[ -f "$item" ]]
+        then
             if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
             then 
                 if [[ "$CHECK" == false ]]
                 then
                     cp -a "$item" "$backup}"      # Faz a copia do item preservando todos os atributos (-a)  
                 fi
-                #echo "cp -a $item $backup"
+                echo "cp -a $item ${backup#"$(dirname $BACKUPOG)/"}"
             fi   
         fi
     done
