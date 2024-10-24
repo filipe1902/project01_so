@@ -11,23 +11,23 @@ sincronizar_arquivos() {
     excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
 
     # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
-    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]] #tem que existir(-f) e não pode estar vazio(-n)
-    then
-        while IFS= read -r line || [ -n "$line" ]   #lê todas as linhas até ao /n e se não tivessemos isto não lia a última linha
-        do
-            excluded_files+=($line)
-        done < "$EXCLUDE_LIST"
-    fi #lista dos excluded_files com os nomes que não queremos copiar para o backup
+    #if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]] #tem que existir(-f) e não pode estar vazio(-n)
+    #then
+    #    while IFS= read -r line || [ -n "$line" ]   #lê todas as linhas até ao /n e se não tivessemos isto não lia a última linha
+    #    do
+    #        excluded_files+=($line)
+    #    done < "$EXCLUDE_LIST"
+    #fi #lista dos excluded_files com os nomes que não queremos copiar para o backup
 
     # find para procurar por diretórios (-type d) e arquivos (-type f) na diretoria de origem ("$ORIGEM"). Os resultados da busca são passados, um por um, para o loop while read -r item, onde item é o caminho completo de cada diretório ou arquivo encontrado.
     find "$ORIGEM" -type d -o -type f | while read -r item
     do
 
         # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
-        if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
-        then
-            continue
-        fi
+        #if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
+        #then
+        #    continue
+        #fi
 
         # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
         #if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
