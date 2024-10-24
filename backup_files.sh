@@ -1,8 +1,6 @@
 #!/bin/bash
 
 sincronizar_arquivos() {
-    
-    echo "Sincronizing new files and modified ones..."
 
     # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel arquivo
     find "$ORIGEM" -maxdepth 1 -type f | while read -r arquivo      
@@ -24,19 +22,18 @@ sincronizar_arquivos() {
 
 remover_arquivos_inexistentes() {
 
-    echo "Removing non-existing files..."
+    # Procura arquivos no diretório de backup
+    find "$BACKUP" -type f | while read -r arquivo; do
+    
+        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
+        origem="$ORIGEM/${arquivo#$BACKUP/}"
 
-    find "$BACKUP" -maxdepth 1 -type f | while read -r arquivo
-    do
-        origem="$ORIGEM/${arquivo#BACKUP}"
-        
-        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
-        then                        # Caso não exista, irá eliminá-lo da do backup tambem
-            if [[ "$CHECK" == false ]]
-            then
-                rm "$arquivo"
+        # Verifica se o arquivo correspondente na origem não existe
+        if [ ! -e "$origem" ]; then
+            if [[ "$CHECK" == false ]]; then  # Se estiver em modo de simulação
+                rm "$arquivo"  # Remove o arquivo no backup
             fi
-            echo "rm $arquivo"
+            echo "m "$arquivo""  # Exibe a ação realizada
         fi
     done
 
@@ -77,9 +74,10 @@ then
     echo "The source directory does not exist."
     exit 1
 fi
-
 # Verifica se o backup não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$BACKUP" ]
+
+
 then
     echo "The backup directory does not exist. Creating one..."
     if [[ "$CHECK" == false ]]
@@ -89,14 +87,20 @@ then
     echo "mkdir -p $BACKUP"
 fi
 
+
 # Verifica as permissões (escrita no backup e leitura na origem)
-if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
+if ([ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
-sincronizar_arquivos
-#remover_arquivos_inexistentes
 
-echo "Backup done!"
+sincronizar_arquivos
+
+#ver se existe backup
+if [[ -e "$BACKUP" ]]
+then
+    remover_arquivos_inexistentes
+fi
+

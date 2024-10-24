@@ -6,50 +6,57 @@ usage() {
 }
 
 sincronizar_arquivos() {
-
-    echo "Sincronizing new files and modified ones..."
-
+    local ORIGEM="$4"
+    local BACKUP="$5"
     excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
 
     # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
-    if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]]
-    then
-        while IFS= read -r line || [ -n "$line" ]
-        do
-            excluded_files+=($line)
-        done < "$EXCLUDE_LIST"
-    fi
+    #if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]] #tem que existir(-f) e não pode estar vazio(-n)
+    #then
+    #    while IFS= read -r line || [ -n "$line" ]   #lê todas as linhas até ao /n e se não tivessemos isto não lia a última linha
+    #    do
+    #        excluded_files+=($line)
+    #    done < "$EXCLUDE_LIST"
+    #fi #lista dos excluded_files com os nomes que não queremos copiar para o backup
 
-    # Procura apenas ficheiros na origem / O input introduzido no read sera o output do find e será guardado na variavel item
+    # find para procurar por diretórios (-type d) e arquivos (-type f) na diretoria de origem ("$ORIGEM"). Os resultados da busca são passados, um por um, para o loop while read -r item, onde item é o caminho completo de cada diretório ou arquivo encontrado.
     find "$ORIGEM" -type d -o -type f | while read -r item
     do
 
         # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
-        if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
-        then
-            continue
-        fi
+        #if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
+        #then
+        #    continue
+        #fi
 
         # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
-        if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
-        then
-            continue
-        fi
+        #if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
+        #then
+        #    continue
+        #fi
 
         # Manipula o valor da variavel item para ser o caminho do backup
-        backup="$BACKUP/${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
+        backup="$BACKUP${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
+        
+        if [[ "$item" == "$ORIGEM" ]]
+        then
+            continue
+        fi  
 
         # Verifica se o ficheiro existe ou o item é mais recente que o backup
         if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
-        then                        
-            if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
-            then
-                mkdir -p $backup    
+        then
+            if [[ ! -d $backup ]]
+            then                   
+                if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
+                then
+                    mkdir -p $backup 
+                fi
+                echo "mkdir -p $backup"
             fi
-            echo "mkdir -p $backup"
 
             # Chama se a si própria recursivamente
-            sincronizar_arquivos ${CHECK:+-c} ${EXCLUDE_LIST:+-b "$EXCLUDE_LIST"} ${REGEX:+-r "$REGEX"} "$item" "$backup"
+            sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
         else
             if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
             then 
@@ -65,22 +72,29 @@ sincronizar_arquivos() {
 
 remover_arquivos_inexistentes() {
 
-    echo "Removing non-existing files..."
+    # Procura arquivos no diretório de backup
+    find "$BACKUP" -type f | while read -r arquivo; do
+    
+        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
+        origem="$ORIGEM/${arquivo#$BACKUP/}"
 
-    find "$BACKUP" -maxdepth 1 -type f | while read -r arquivo
-    do
-        origem="$ORIGEM/${arquivo#BACKUP}"
-        
-        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
-        then                        # Caso não exista, irá eliminá-lo da do backup tambem
-            if [[ "$CHECK" == false ]]
-            then
-            	rm "$arquivo"     
+        # Verifica se o arquivo correspondente na origem não existe
+        if [ ! -e "$origem" ]; then
+            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
+                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
+            else
+                rm "$arquivo"  # Remove o arquivo no backup
+                echo "File deleted: $arquivo"  # Exibe a ação realizada
             fi
-            echo "rm $arquivo"
         fi
-    done 
+    done
+
+    # Remove diretórios vazios no backup
+    find "$BACKUP" -type d -empty -delete
 }
+
+
+
 
 CHECK=false # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
 EXCLUDE_LIST=""
@@ -110,14 +124,14 @@ BACKUP="$2"
 # Verifica se a origem não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$ORIGEM" ]
 then
-    echo "The source directory does not exist."
+    echo "$1 is not a directory"
     exit 1
 fi
+
 
 # Verifica se o backup não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$BACKUP" ]
 then
-    echo "The backup directory does not exist. Creating one..."
     if [[ "$CHECK" == false ]]
     then
         mkdir -p "$BACKUP"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
@@ -126,15 +140,17 @@ then
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
-if [ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]
+if ([ ! -w "$BACKUP" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
 
-sincronizar_arquivos 
-remover_arquivos_inexistentes 
+sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUP"
+#if [[ -e "$BACKUP" ]]
+#then
+    #remover_arquivos_inexistentes
+#fi
 
 echo "Backup done!"
-
