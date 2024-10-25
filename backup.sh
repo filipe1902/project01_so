@@ -74,8 +74,8 @@ sincronizar_arquivos() {
 remover_arquivos_inexistentes() {
 
     # Procura arquivos no diretório de backup
-    find "$BACKUP" -type f | while read -r arquivo; do
-    
+    for item in $BACKUP/*
+    do    
         # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
         origem="$ORIGEM/${arquivo#$BACKUP/}"
 
@@ -136,7 +136,7 @@ then
     then
         mkdir -p "$BACKUPOG"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
     fi
-    echo "mkdir ${BACKUPOG#*/}"
+    echo "mkdir ${BACKUPOG#"$(dirname $BACKUPOG)/"}"
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
