@@ -79,8 +79,20 @@ remover_arquivos_inexistentes() {
     # Procura arquivos no diretório de backup
     for item in $BACKUP/*
     do    
+
+        echo " b $BACKUP"
+        echo " i $item"
+
+        if [[ "$item" == "$BACKUP" ]]
+        then
+            continue
+        fi 
+
         # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
         origem="$ORIGEM/${item#$BACKUP/}"
+
+        echo " o $origem"
+        echo " i $item"
 
         if [[ -d "$item" ]]
         then
