@@ -65,7 +65,7 @@ sincronizar_arquivos() {
                 then
                     cp -a "$item" "$backup}"      # Faz a copia do item preservando todos os atributos (-a)  
                 fi
-                echo "cp -a $item ${backup#"$(dirname $BACKUPOG)/"}"
+                echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
             fi   
         fi
     done
@@ -119,11 +119,11 @@ if [ $# -ne 2 ]; then
     usage
 fi
 
-ORIGEM="$1"
+ORIGEMOG="$1"
 BACKUPOG="$2"
 
 # Verifica se a origem não é uma diretoria e consequencialmente se não existe
-if [ ! -d "$ORIGEM" ]
+if [ ! -d "$ORIGEMOG" ]
 then
     echo "$1 is not a directory"
     exit 1
@@ -140,14 +140,14 @@ then
 fi
 
 # Verifica as permissões (escrita no backup e leitura na origem)
-if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEM" ]) && [[ $CHECK == false ]]
+if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEMOG" ]) && [[ $CHECK == false ]]
 then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
     exit 2
 fi
 
 
-sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEM" "$BACKUPOG"
+sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 #if [[ -e "$BACKUP" ]]
 #then
     #remover_arquivos_inexistentes
