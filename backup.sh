@@ -73,25 +73,41 @@ sincronizar_arquivos() {
 
 remover_arquivos_inexistentes() {
 
+    local ORIGEM="$2"
+    local BACKUP="$3"
+
     # Procura arquivos no diretório de backup
     for item in $BACKUP/*
     do    
         # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
-        origem="$ORIGEM/${arquivo#$BACKUP/}"
+        origem="$ORIGEM/${item#$BACKUP/}"
 
-        # Verifica se o arquivo correspondente na origem não existe
-        if [ ! -e "$origem" ]; then
-            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
-                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
-            else
-                rm "$arquivo"  # Remove o arquivo no backup
-                echo "File deleted: $arquivo"  # Exibe a ação realizada
+        if [[ -d "$item" ]]
+        then
+            if [[ ! -d "$origem" ]]
+            then
+
+                if [[ "$CHECK" == false ]]
+                then
+                    rm -rf "$item"
+                fi
+                echo "rm -rf $item"
+                continue
+            fi
+
+            remover_arquivos_inexistentes "$CHECK" "$origem" "$item"
+        elif [[ -f "$item" ]]
+        then
+            if [[ ! -f "$origem" ]]
+            then
+                if [[ "$CHECK" == false ]]
+                then
+                    rm "$item"
+                fi
+                echo "rm $item"
             fi
         fi
     done
-
-    # Remove diretórios vazios no backup
-    find "$BACKUP" -type d -empty -delete
 }
 
 
@@ -148,8 +164,8 @@ fi
 
 
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
-#if [[ -e "$BACKUP" ]]
-#then
-    #remover_arquivos_inexistentes
-#fi
+if [[ -e "$BACKUPOG" ]]
+then
+    remover_arquivos_inexistentes "$CHECK" "$ORIGEMOG" "$BACKUPOG"
+fi
 
