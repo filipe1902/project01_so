@@ -15,15 +15,11 @@ sincronizar_arquivos() {
         # Verifica se o ficheiro existe ou o arquivo é mais recente que o backup
         if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]       # '-nt' = newer than
         then    
-            if [[ "$CHECK" == true ]]
+            if [[ "$CHECK" == false ]]
             then
-                echo "cp -a $arquivo $backup"            
-            else
                 cp -a "$arquivo" "$backup"      # Faz a copia do arquivo preservando todos os atributos (-a)  
-                echo "cp -a $arquivo $backup"
-
-                echo "File $arquivo updated."
             fi
+            echo "cp -a $arquivo $backup"
         fi
     done
 }
@@ -34,20 +30,17 @@ remover_arquivos_inexistentes() {
 
     echo "Removing non-existing files..."
 
-    # Procura arquivos no diretório de backup
-    find "$BACKUP" -type f | while read -r arquivo; do
-    
-        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
-        origem="$ORIGEM/${arquivo#$BACKUP/}"
-
-        # Verifica se o arquivo correspondente na origem não existe
-        if [ ! -e "$origem" ]; then
-            if [[ "$CHECK" == true ]]; then  # Se estiver em modo de simulação
-                echo "Simulação: rm $arquivo"  # Exibe a ação que seria tomada
-            else
-                rm "$arquivo"  # Remove o arquivo no backup
-                echo "File deleted: $arquivo"  # Exibe a ação realizada
+    find "$BACKUP" -maxdepth 1 -type f | while read -r arquivo
+    do
+        origem="$ORIGEM/${arquivo#BACKUP}"
+        
+        if [ ! -e "$origem" ]       # Verifica se o arquivo origem existe no arquivo backup
+        then                        # Caso não exista, irá eliminá-lo da do backup tambem
+            if [[ "$CHECK" == false ]]
+            then
+                rm "$arquivo"
             fi
+            echo "rm $arquivo"
         fi
     done
 
