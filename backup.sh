@@ -63,7 +63,7 @@ sincronizar_arquivos() {
             then 
                 if [[ "$CHECK" == false ]]
                 then
-                    cp -a "$item" "$backup}"      # Faz a copia do item preservando todos os atributos (-a)  
+                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
             fi   
@@ -77,12 +77,9 @@ remover_arquivos_inexistentes() {
     local BACKUP="$3"
 
     # Procura arquivos no diretório de backup
-    for item in $BACKUP/*
-    do    
-
-        echo " b $BACKUP"
-        echo " i $item"
-
+    for item in "$BACKUP"/*
+    do
+    
         if [[ "$item" == "$BACKUP" ]]
         then
             continue
@@ -91,14 +88,10 @@ remover_arquivos_inexistentes() {
         # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
         origem="$ORIGEM/${item#$BACKUP/}"
 
-        echo " o $origem"
-        echo " i $item"
-
         if [[ -d "$item" ]]
         then
             if [[ ! -d "$origem" ]]
             then
-
                 if [[ "$CHECK" == false ]]
                 then
                     rm -rf "$item"
