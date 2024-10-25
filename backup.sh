@@ -96,7 +96,7 @@ remover_arquivos_inexistentes() {
                 then
                     rm -rf "$item"
                 fi
-                echo "rm -rf $item"
+                echo "rm -rf ${item#"$(dirname $BACKUPOG)/"}"
                 continue
             fi
 
@@ -109,7 +109,7 @@ remover_arquivos_inexistentes() {
                 then
                     rm "$item"
                 fi
-                echo "rm $item"
+                echo "rm ${item#"$(dirname $BACKUPOG)/"}"
             fi
         fi
     done
