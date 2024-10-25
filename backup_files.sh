@@ -24,8 +24,10 @@ remover_arquivos_inexistentes() {
 
     # Loop para iterar sobre cada arquivo no diretório de backup (sem usar o find)
     for arquivo in "$BACKUPOG"/*; do
+
         # Verifica se é um arquivo regular
         if [ -f "$arquivo" ]; then
+
             # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
             origem="$ORIGEMOG/${arquivo#$BACKUPOG}"
 
