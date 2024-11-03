@@ -1,0 +1,10 @@
+criei isto para saber o que está a funfar no backup em termos de testes
+
+-fez o backup bem (foi ás subdiretorias todas)
+-alterei dois ficheiros na source e ele fez apenas a alteracao desses ficheiros (um deles estava numa subdiretoria)
+-se fizermos o backup uma vez, e a seguir executarmos o mesmo comando sem alterar nada, ele não faz nada (como é suposto)
+-remove todos os ficheiros que estão no backup e nao no source (pastas e ficheiros)
+
+-tudo o que escrevi anteriormente esta a fazer no modo checking
+
+-tudo está a funcionar para o parametro b (exclude files)

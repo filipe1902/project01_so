@@ -8,40 +8,44 @@ usage() {
 sincronizar_arquivos() {
     local ORIGEM="$4"
     local BACKUP="$5"
-    excluded_files=()        # Inicializa a lista que vai guardar os ficheiros a exluir
-
-    # Verifica se a lista não está vazia (-n) e se o ficheiro existe (-f)
-    #if [[ -n "$EXCLUDE_LIST" ]] && [[ -f "$EXCLUDE_LIST" ]] #tem que existir(-f) e não pode estar vazio(-n)
-    #then
-    #    while IFS= read -r line || [ -n "$line" ]   #lê todas as linhas até ao /n e se não tivessemos isto não lia a última linha
-    #    do
-    #        excluded_files+=($line)
-    #    done < "$EXCLUDE_LIST"
-    #fi #lista dos excluded_files com os nomes que não queremos copiar para o backup
 
     for item in $ORIGEM/*; do 
 
-        # Verifica se o nome base do arquivo na origem é igual a algum ficheiro na lista de ficheiros a excluir
-        #if [[ "${excluded_files[@]}" =~ $(basename "$arquivo") ]]
-        #then
-        #    continue
-        #fi
-
-        # Verifica se a regex não está vazia e se nome base do arquivo na origem é diferente da regex
-        #if [[ -n "$REGEX" ]] && [[ ! "$(basename "$arquivo")" =~ $REGEX ]]
-        #then
-        #    continue
-        #fi
+        echo "$item" 
+        echo ""
+        echo "$item" | grep -qE "$REGEX"
+        echo "status grep: $?"
+        echo ""
+        [[ -n "$REGEX" ]]
+        echo "regex nao vazio: $?"
+        echo ""
 
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
-        
+
         if [[ "$item" == "$ORIGEM" ]]
         then
             continue
         fi  
+        
+        nome_item=$(basename "$item")
 
-            
+        echo "$nome_item"
+        
+        for exclude in "${excluded_files[@]}"      # para cada ficheiro na lista de ficheiros a excluir
+        do  
+            if [[ "$exclude" == "$nome_item" ]]      # se o item atual corresponder ao ficheiro a excluir
+            then
+                continue 2                           # salta dois niveis do loop, ou seja sai do foor lop exclude 
+            fi
+        done
+
+        # Verifica a expressão regular se estiver definida
+        if [[ -n "$REGEX" ]] && ! echo "$nome_item" | grep -qE "$REGEX"; then
+            continue   # Se o nome do arquivo não corresponder à regex, ignora este item
+        fi
+
+
         # Verifica se o ficheiro existe ou o item é mais recente que o backup
         if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
         then
@@ -118,9 +122,10 @@ remover_arquivos_inexistentes() {
 
 
 
-CHECK=false # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
+CHECK=false                             # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
 EXCLUDE_LIST=""
 REGEX=""
+excluded_files=()                       # inicializa a lista de ficheiros a excluir
                                         # : atrás é uma convenção usada para lidar com erros em bash de forma efetiva
                                         # todos os comandos seguido de um : indica que recebe argumentos
 while getopts ":cb:r:" opt              # getopts é uma utilidade built in que simplifica parsing flags
@@ -167,6 +172,16 @@ then
     exit 2
 fi
 
+if [[ -n "$EXCLUDE_LIST" ]]         # se a lista foi não está vazia (ou seja, foi passada como argumento)
+then
+    while IFS= read -r line
+    do  
+        excluded_files+=("$line")
+    done < "$EXCLUDE_LIST"
+fi
+
+#echo "$REGEX"
+#echo "/home/filipe0219/Documents/SO/testes/1txt" | grep -E "$REGEX"
 
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 if [[ -e "$BACKUPOG" ]]
