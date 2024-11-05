@@ -132,6 +132,7 @@ remover_arquivos_inexistentes() {
                 fi
                 echo "rm -rf ${item#"$(dirname $BACKUPOG)/"}"
                 ((delete_count++))
+                exibir_warnings "$ORIGEM"
                 continue
             fi
 
@@ -149,6 +150,7 @@ remover_arquivos_inexistentes() {
                 echo "rm ${item#"$(dirname $BACKUPOG)/"}"
                 ((delete_count++))
                 delete_size=$((deleted_size + file_size))
+                exibir_warnings "$ORIGEM"
             fi
         fi
     done
