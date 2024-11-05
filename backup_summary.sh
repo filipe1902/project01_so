@@ -178,4 +178,3 @@ if [[ -e "$BACKUPOG" ]]
 then
     remover_arquivos_inexistentes "$CHECK" "$ORIGEMOG" "$BACKUPOG"
 fi
-
