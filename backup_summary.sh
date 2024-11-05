@@ -1,13 +1,38 @@
 #!/bin/bash
 
+
+error_count=0
+warning_count=0
+update_count=0
+copy_count=0
+delete_count=0
+copied_size=0
+deleted_size=0
+
+
 usage() {
     echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
     exit 1
 }
 
+exibir_warnings() {
+    dir_path="$1"
+    echo "While backuping $dir_path: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ($copied_size B); $delete_count Deleted ($deleted_size B)"
+}
+
 sincronizar_arquivos() {
     local ORIGEM="$4"
     local BACKUP="$5"
+
+    #Vou iniciar counters e tamahos(b)
+    #error_count=0
+    #warning_count=0
+    #update_count=0
+    #copy_count=0
+    #delete_count=0
+    #copied_size=0
+    #deleted_size=0
+
 
     for item in $ORIGEM/*; do
     
@@ -19,8 +44,6 @@ sincronizar_arquivos() {
         then
             continue
         fi  
-
-        echo "$nome_item"
         
         for exclude in "${excluded_files[@]}"      # para cada ficheiro na lista de ficheiros a excluir
         do  
@@ -51,18 +74,35 @@ sincronizar_arquivos() {
             # Chama se a si própria recursivamente
             sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
 
-        elif [[ -f "$item" ]]
-        then
-            if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
-            then 
-                if [[ "$CHECK" == false ]]
-                then
-                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
+        elif [[ -f "$item" ]]; then
+            if [[ -e "$backup" ]] && [[ "$backup" -nt "$item" ]]; then
+                echo "WARNING: backup entry $backup is newer than $item; Should not happen"
+                ((warning_count++))
+            fi
+
+            if [[ ! -e "$backup" ]] || [[ "$item" -nt "$backup" ]]; then 
+                file_size=$(stat -c%s "$item")      #usamos stat para obter o tamanho do arquivode $item em bytes
+                if [[ "$CHECK" == false ]]; then    #o -c%s é um formato que retorna o tamanho em bytes
+                    cp -a "$item" "$backup"
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
+                ((copy_count++))
+                copied_size=$((copied_size + file_size))
+                if [ ! -e "$backup" ]; then
+                    echo "jotal"
+                    ((copy_count++))
+                    copied_size=$((copied_size + file_size))
+                else
+                    echo "Jotal1"
+                    ((update_count++))
+                    copied_size=$((copied_size + file_size))
+                fi
             fi   
         fi
     done
+
+    # Exibir resumo no final
+    exibir_warnings "$ORIGEM"
 }
 
 remover_arquivos_inexistentes() {
@@ -91,19 +131,24 @@ remover_arquivos_inexistentes() {
                     rm -rf "$item"
                 fi
                 echo "rm -rf ${item#"$(dirname $BACKUPOG)/"}"
+                ((delete_count++))
                 continue
             fi
 
             remover_arquivos_inexistentes "$CHECK" "$origem" "$item"
+
         elif [[ -f "$item" ]]
         then
             if [[ ! -f "$origem" ]]
             then
-                if [[ "$CHECK" == false ]]
+                file_size=$(stat -c%s "$item")  #usamos stat para obter o tamanho do arquivode $item em bytes
+                if [[ "$CHECK" == false ]]      #o -c%s é um formato que retorna o tamanho em bytes
                 then
                     rm "$item"
                 fi
                 echo "rm ${item#"$(dirname $BACKUPOG)/"}"
+                ((delete_count++))
+                delete_size=$((deleted_size + file_size))
             fi
         fi
     done
@@ -170,11 +215,10 @@ then
     done < "$EXCLUDE_LIST"
 fi
 
-#echo "$REGEX"
-#echo "/home/filipe0219/Documents/SO/testes/1txt" | grep -E "$REGEX"
-
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 if [[ -e "$BACKUPOG" ]]
 then
     remover_arquivos_inexistentes "$CHECK" "$ORIGEMOG" "$BACKUPOG"
 fi
+
+#exibir_warnings "$ORIGEMOG"

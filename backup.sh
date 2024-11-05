@@ -18,9 +18,7 @@ sincronizar_arquivos() {
         if [[ "$item" == "$ORIGEM" ]]
         then
             continue
-        fi  
-
-        echo "$nome_item"
+        fi
         
         for exclude in "${excluded_files[@]}"      # para cada ficheiro na lista de ficheiros a excluir
         do  
@@ -29,6 +27,7 @@ sincronizar_arquivos() {
                 continue 2                           # salta dois niveis do loop, ou seja, sai do foor lop exclude 
             fi
         done
+
 
         # Verifica a expressão regular se estiver definida
         if [[ -n "$REGEX" ]] && ! echo "$nome_item" | grep -qE "$REGEX"; then
@@ -123,8 +122,8 @@ do
     case "$opt" in
         c) CHECK=true ;;
         b) EXCLUDE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
-        r) REGEX="$OPTARG" ;;
-        *) usage;;                      
+        r) REGEX="$OPTARG" ;;       # validar o regex depois de capturar o arg da opção -r
+        *) usage ;;                      
     esac
 done
                                         # OPTIND é uma variavel especial que aponta para o proximo argumento depois da ultima opcao
@@ -169,9 +168,6 @@ then
         excluded_files+=("$line")
     done < "$EXCLUDE_LIST"
 fi
-
-#echo "$REGEX"
-#echo "/home/filipe0219/Documents/SO/testes/1txt" | grep -E "$REGEX"
 
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 if [[ -e "$BACKUPOG" ]]
