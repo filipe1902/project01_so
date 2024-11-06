@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 error_count=0
 warning_count=0
 update_count=0
@@ -23,15 +22,6 @@ exibir_warnings() {
 sincronizar_arquivos() {
     local ORIGEM="$4"
     local BACKUP="$5"
-
-    #Vou iniciar counters e tamahos(b)
-    #error_count=0
-    #warning_count=0
-    #update_count=0
-    #copy_count=0
-    #delete_count=0
-    #copied_size=0
-    #deleted_size=0
 
 
     for item in $ORIGEM/*; do
@@ -86,14 +76,14 @@ sincronizar_arquivos() {
                     cp -a "$item" "$backup"
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
+                
                 ((copy_count++))
                 copied_size=$((copied_size + file_size))
+                
                 if [ ! -e "$backup" ]; then
-                    echo "jotal"
                     ((copy_count++))
                     copied_size=$((copied_size + file_size))
                 else
-                    echo "Jotal1"
                     ((update_count++))
                     copied_size=$((copied_size + file_size))
                 fi
@@ -149,14 +139,12 @@ remover_arquivos_inexistentes() {
                 fi
                 echo "rm ${item#"$(dirname $BACKUPOG)/"}"
                 ((delete_count++))
-                delete_size=$((deleted_size + file_size))
+                deleted_size=$((deleted_size + file_size))
                 exibir_warnings "$ORIGEM"
             fi
         fi
     done
 }
-
-
 
 
 CHECK=false                             # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
