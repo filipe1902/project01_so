@@ -15,11 +15,6 @@ sincronizar_arquivos() {
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
 
-        if [[ "$item" == "$ORIGEM" ]]
-        then
-            continue
-        fi
-        
         for exclude in "${excluded_files[@]}"      # para cada ficheiro na lista de ficheiros a excluir
         do  
             if [[ "$exclude" == "$nome_item" ]]      # se o item atual corresponder ao ficheiro a excluir
