@@ -1,18 +1,16 @@
 #!/bin/bash
 
 sincronizar_arquivos() {
-
     # Loop para iterar sobre cada arquivo na diretoria origem - sem find
     for arquivo in "$ORIGEMOG"/*; do
-        # Verifica se é um arquivo regular
+        
         if [ -f "$arquivo" ]; then
-            # Manipula o valor da variável arquivo para ser o caminho do backup
-            backup="$BACKUPOG/${arquivo#$ORIGEMOG}"
+            
+            backup="$BACKUPOG${arquivo#$ORIGEMOG}"
 
-            # Verifica se o arquivo não existe no backup ou se é mais recente que o backup
             if [ ! -e "$backup" ] || [ "$arquivo" -nt "$backup" ]; then
                 if [[ "$CHECK" == false ]]; then
-                    cp -a "$arquivo" "$backup"  # Faz a cópia do arquivo preservando todos os atributos (-a)
+                    cp -a "$arquivo" "$backup" 
                 fi
                 echo "cp -a ${arquivo#"$(dirname "$ORIGEMOG")/"} ${backup#"$(dirname "$BACKUPOG")/"}"
             fi
@@ -26,7 +24,7 @@ remover_arquivos_inexistentes() {
     for arquivo in "$BACKUPOG"/*; do
 
         # Verifica se é um arquivo regular
-        if [ -f "$arquivo" ]; then
+        if [ -f "$arquivo" ]; thenS
 
             # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
             origem="$ORIGEMOG/${arquivo#$BACKUPOG}"

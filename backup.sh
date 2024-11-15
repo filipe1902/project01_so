@@ -158,8 +158,9 @@ fi
 
 if [[ -n "$EXCLUDE_LIST" ]]         # se a lista foi não está vazia (ou seja, foi passada como argumento)
 then
-    while IFS= read -r line
+    while IFS= read -r line || [[ -n "$line" ]];
     do  
+        line=$(echo "$line" | xargs)
         excluded_files+=("$line")
     done < "$EXCLUDE_LIST"
 fi
