@@ -65,6 +65,7 @@ else
 fi
 
 if [ ! -d "$ORIGEMOG" ]; then
+    echo "Usage: $0 [-c] <source.directory> <backup.directory>"
     exit 1
 fi
 

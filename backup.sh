@@ -12,37 +12,33 @@ sincronizar_arquivos() {
     for item in $ORIGEM/*; do
     
         nome_item=$(basename "$item")
-        # Manipula o valor da variavel item para ser o caminho do backup
-        backup="$BACKUP${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
+        backup="$BACKUP${item#$ORIGEM}"         
 
-        for exclude in "${excluded_files[@]}"      # para cada ficheiro na lista de ficheiros a excluir
+        for exclude in "${excluded_files[@]}"     
         do  
-            if [[ "$exclude" == "$nome_item" ]]      # se o item atual corresponder ao ficheiro a excluir
+            if [[ "$exclude" == "$nome_item" ]]     
             then
-                continue 2                           # salta dois niveis do loop, ou seja, sai do foor lop exclude 
+                continue 2                           
             fi
         done
 
 
         # Verifica a expressão regular se estiver definida
         if [[ -n "$REGEX" ]] && ! echo "$nome_item" | grep -qE "$REGEX"; then
-            continue   # Se o nome do arquivo não corresponder à regex, ignora este item
+            continue   
         fi
 
-
-        # Verifica se o ficheiro existe ou o item é mais recente que o backup
-        if [[ -d "$item" ]]      # Verifica se o item é uma diretoria
+        if [[ -d "$item" ]]      
         then
             if [[ ! -d $backup ]]
             then                   
-                if [[ "$CHECK" == false ]]       # Verifica se está no modo checking
+                if [[ "$CHECK" == false ]]       
                 then
                     mkdir $backup 
                 fi
                 echo "mkdir ${backup#"$(dirname $BACKUPOG)/"}"
             fi
 
-            # Chama se a si própria recursivamente
             sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$item" "$backup"
 
         elif [[ -f "$item" ]]
