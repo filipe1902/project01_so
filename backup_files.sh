@@ -22,7 +22,7 @@ remover_arquivos_inexistentes() {
     # Loop para iterar sobre cada ficheiro na diretoria de backup 
     for arquivo in "$BACKUPOG"/*; do
 
-        if [ -f "$arquivo" ]; thenS
+        if [ -f "$arquivo" ]; then
 
             origem="$ORIGEMOG/${arquivo#$BACKUPOG}"
 
@@ -44,25 +44,21 @@ remover_arquivos_inexistentes() {
     done
 }
 
-# Verifica se o utilizador introduziu menos de dois ou mais que três argumentos
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
     echo "Usage: $0 [-c] <source.directory> <backup.directory>"
     exit 1
 fi
 
-# Verifica se, para três argumentos, o primeiro argumento é '-c'
-CHECK=false  # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
+CHECK=false  
 if [[ $# -eq 3 ]] && [[ "$1" == "-c" ]]; then
     CHECK=true
     ORIGEMOG="$2"
     BACKUPOG="$3"
 
-# Caso o primeiro argumento não seja '-c', sai do programa
 elif [[ $# -eq 3 ]] && [[ "$1" != "-c" ]]; then
     echo "Usage: $0 [-c] <source.directory> <backup.directory>"
     exit 1
 
-# Caso só tenha dois argumentos:
 else
     ORIGEMOG="$1"
     BACKUPOG="$2"
