@@ -43,11 +43,11 @@ sincronizar_arquivos() {
 
         elif [[ -f "$item" ]]
         then
-            if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]       # '-nt' = newer than
+            if [ ! -e "$backup" ] || [ "$item" -nt "$backup" ]      
             then 
                 if [[ "$CHECK" == false ]]
                 then
-                    cp -a "$item" "$backup"      # Faz a copia do item preservando todos os atributos (-a)  
+                    cp -a "$item" "$backup"     
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
             fi   
