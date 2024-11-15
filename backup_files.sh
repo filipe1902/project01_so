@@ -64,27 +64,23 @@ else
     BACKUPOG="$2"
 fi
 
-# Verifica se a origem não é uma diretoria e, consequentemente, se não existe
 if [ ! -d "$ORIGEMOG" ]; then
     exit 1
 fi
 
-# Verifica se o backup não é uma diretoria e, consequentemente, se não existe
 if [ ! -d "$BACKUPOG" ]; then
     if [[ "$CHECK" == false ]]; then
-        mkdir -p "$BACKUPOG"  # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
+        mkdir -p "$BACKUPOG"  
     fi
     echo "mkdir -p ${BACKUPOG#"$(dirname "$BACKUPOG")/"}"
 fi
 
-# Verifica as permissões (escrita no backup e leitura na origem)
 if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEMOG" ]) && [[ $CHECK == false ]]; then
     exit 2
 fi
 
 sincronizar_arquivos
 
-# Verifica se o backup existe
 if [[ -d "$BACKUPOG" ]]; then
     remover_arquivos_inexistentes
 fi
