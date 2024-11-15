@@ -19,31 +19,27 @@ sincronizar_arquivos() {
 }
 
 remover_arquivos_inexistentes() {
-
-    # Loop para iterar sobre cada arquivo no diretório de backup (sem usar o find)
+    # Loop para iterar sobre cada ficheiro na diretoria de backup 
     for arquivo in "$BACKUPOG"/*; do
 
-        # Verifica se é um arquivo regular
         if [ -f "$arquivo" ]; thenS
 
-            # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
             origem="$ORIGEMOG/${arquivo#$BACKUPOG}"
 
-            # Verifica se o arquivo correspondente na origem não existe
             if [ ! -e "$origem" ]; then
                 if [[ "$CHECK" == false ]]; then
-                    rm "$arquivo"  # Remove o arquivo no backup
+                    rm "$arquivo"  
                 fi
                 echo "rm ${arquivo#"$(dirname "$BACKUPOG")/"}"
             fi
         fi
     done
 
-    # Remove diretórios vazios no backup
+    # Loop para iterar sobre cada diretoria na diretoria backup
     for dir in "$BACKUPOG"/*; do
         if [ -d "$dir" ] && [ -z "$(ls -A "$dir")" ]; then
-            rmdir "$dir"  # Remove diretório vazio
-            echo "Removed empty directory: ${dir#"$(dirname "$BACKUPOG")/"}"
+            rmdir "$dir"  
+            echo "rm ${arquivo#"$(dirname "$BACKUPOG")/"}"
         fi
     done
 }
