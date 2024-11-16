@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: $0 <source_directory> <backup_directory>"
+    echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
     exit 1
 }
 
@@ -12,18 +12,18 @@ check_files() {
     for item in "$ORIGEM"/*; do
     
         nome_item=$(basename "$item")
-        backup="$BACKUP${item#$ORIGEM}"     
+        backup="$BACKUP${item#$ORIGEM}"         
 
-        relative_backup="${backup#"$(dirname $BACKUPOG)/"}"
-        relative_item="${item#"$(dirname $ORIGEMOG)/"}"
-    
-        if [[ -d "$item" ]]; then     
+        relative_item="testes/${item#$ORIGEM/}"
+        relative_backup="backup/${item#$ORIGEM/}"
+
+        # Verifica se o ficheiro existe ou o item é mais recente que o backup
+        if [[ -d "$item" ]]; then      # Verifica se o item é uma diretoria
             if [[ -d "$backup" ]]; then
-
+                # Chama se a si própria recursivamente
                 check_files "$item" "$backup"
-
             else 
-              
+                # nao existe
                 echo "Directory $relative_backup does not exist"
             fi
 
@@ -33,11 +33,11 @@ check_files() {
                 backup_check=$(md5sum "$backup" | awk '{print $1}')        # usa se para extrair o primeiro campo do output, que é o hash do item
 
                 if [[ "$source_check" != "$backup_check" ]]; then                     # aqui verificamos se o hash do item é diferente ao do seu backup
-                   
+                    # diferem
                     echo "File $relative_item and $relative_backup differ"
                 fi 
             else
-                
+                # nao existe
                 echo "File $relative_backup does not exist"
             fi   
         fi
@@ -48,20 +48,19 @@ if [ $# -ne 2 ]; then
     usage
 fi
 
-ORIGEMOG="$1"
-BACKUPOG="$2"
+ORIGEM="$1"
+BACKUP="$2"
 
-
-if [ ! -d "$ORIGEMOG" ]; then
+# Verifica se a origem não é uma diretoria e consequencialmente se não existe
+if [ ! -d "$ORIGEM" ]; then
     echo "$1 is not a directory"
     exit 1
 fi
 
-
-if [ ! -d "$BACKUPOG" ]; then
+# Verifica se o backup não é uma diretoria e consequencialmente se não existe
+if [ ! -d "$BACKUP" ]; then
     echo "$2 is not a directory"
     exit 1
 fi
 
-check_files "$ORIGEMOG" "$BACKUPOG"
-
+check_files "$ORIGEM" "$BACKUP"

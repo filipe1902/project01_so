@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
+    echo "Usage: $0 <source_directory> <backup_directory>"
     exit 1
 }
 
@@ -101,21 +101,20 @@ CHECK=false
 EXCLUDE_LIST=""
 REGEX=""
 excluded_files=()                       
-                                        # ':'' atrás é uma convenção usada para lidar com erros em bash de forma efetiva
-                                        # todos os comandos seguido de um : indica que recebe argumentos
-while getopts ":cb:r:" opt              # getopts é uma utilidade built in que simplifica parsing flags
+                                        
+                                   
+while getopts ":cb:r:" opt              
 do
     case "$opt" in
         c) CHECK=true ;;
-        b) EXCLUDE_LIST="$OPTARG" ;;        # "$OPTARG" é uma variável especial que recebe o argumento da opção atual
-        r) REGEX="$OPTARG" ;;       # validar o regex depois de capturar o arg da opção -r
+        b) EXCLUDE_LIST="$OPTARG" ;;        
+        r) REGEX="$OPTARG" ;;       
         *) usage ;;                      
     esac
 done
-                                        # OPTIND é uma variavel especial que aponta para o proximo argumento depois da ultima opcao
-shift $((OPTIND - 1))                   # subtraimos 1 a OPTIND porque, sabemos que OPTIND aponta para o primeiro argumento obrigatorio
-                                        # e nós queremos dar shift até ele e não passar por ele
-
+                                       
+shift $((OPTIND - 1))                   
+                                        
 if [ $# -ne 2 ]; then
     usage
 fi
@@ -145,7 +144,7 @@ then
     exit 2
 fi
 
-if [[ -n "$EXCLUDE_LIST" ]]         # se a lista foi não está vazia (ou seja, foi passada como argumento)
+if [[ -n "$EXCLUDE_LIST" ]]        
 then
     while IFS= read -r line || [[ -n "$line" ]];
     do  
