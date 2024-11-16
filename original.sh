@@ -11,8 +11,7 @@ exibir_warnings() {
     if [[ -z "$relative_path" ]]; then
         relative_path=$(basename "$ORIGEMOG")  # Usa o nome da origem se o caminho relativo for vazio
     fi
-    echo "While backuping ${relative_path#/}: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ($copied_size B); $delete_count Deleted ($deleted_size B)"
-    echo ""
+    echo "While backuping ${relative_paht#/}: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
 }
 
 sincronizar_arquivos() {
