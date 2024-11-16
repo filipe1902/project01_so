@@ -23,7 +23,7 @@ check_files() {
                 check_files "$item" "$backup"
 
             else 
-              
+            
                 echo "Directory $relative_backup does not exist"
             fi
 
@@ -33,7 +33,7 @@ check_files() {
                 backup_check=$(md5sum "$backup" | awk '{print $1}')        # usa se para extrair o primeiro campo do output, que é o hash do item
 
                 if [[ "$source_check" != "$backup_check" ]]; then                     # aqui verificamos se o hash do item é diferente ao do seu backup
-                   
+                
                     echo "File $relative_item and $relative_backup differ"
                 fi 
             else
