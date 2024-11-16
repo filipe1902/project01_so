@@ -1,13 +1,5 @@
 #!/bin/bash
 
-#error_count=0
-#warning_count=0
-#update_count=0
-#copy_count=0
-#delete_count=0
-#copied_size=0
-#deleted_size=0
-
 usage() {
     echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
     exit 1
@@ -231,7 +223,7 @@ if [[ -n "$EXCLUDE_LIST" ]]; then
     done < "$EXCLUDE_LIST"
 fi
 
-
+shopt -s dotglob
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 if [[ -e "$BACKUPOG" ]]; then
     remover_arquivos_inexistentes "$CHECK" "$ORIGEMOG" "$BACKUPOG"
