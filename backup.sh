@@ -12,7 +12,27 @@ sincronizar_arquivos() {
     for item in $ORIGEM/*; do
     
         nome_item=$(basename "$item")
-        backup="$BACKUP${item#$ORIGEM}"         
+        backup="$BACKUP${item#$ORIGEM}" 
+
+        relative_backup=${backup#"$(dirname $BACKUPOG)/"}
+        relative_item=${item#"$(dirname $ORIGEMOG)/"}
+
+        if [[ "$item" == "$ORIGEM/*" ]]
+        then 
+            continue
+        fi
+
+        if [[ ! -r "$item" ]]
+        then
+            echo "ERROR: "$relative_item" does not have reading permissions."
+            continue
+        fi
+
+        if [[ -e "$backup" && ! -w "$backup" ]]
+        then
+            echo "ERROR: "$relative_backup" does not have writing permissions."
+            continue
+        fi        
 
         for exclude in "${excluded_files[@]}"     
         do  
@@ -21,6 +41,7 @@ sincronizar_arquivos() {
                 continue 2                           
             fi
         done
+        
 
 
         # Verifica a expressão regular se estiver definida

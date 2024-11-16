@@ -15,34 +15,6 @@ exibir_warnings() {
     echo ""
 }
 
-
-verificar_condicoes() {
-    # Verificar se o diretório origem existe
-    if [ ! -d "$ORIGEMOG" ]; then
-        echo "Error: Source directory '$ORIGEMOG' does not exist."
-        ((error_count++))
-    fi
-
-    # Verificar permissões de escrita no backup
-    if [ ! -w "$BACKUPOG" ]; then
-        echo "Error: No write permission for backup directory '$BACKUPOG'."
-        ((error_count++))
-    fi
-
-    # Verificar permissões de leitura na origem
-    if [ ! -r "$ORIGEMOG" ]; then
-        echo "Error: No read permission for source directory '$ORIGEMOG'."
-        ((error_count++))
-    fi
-
-    # Verificar se há erros no final das verificações
-    if [[ $error_count -gt 0 ]]; then
-        exibir_warnings "$ORIGEM"
-        exit 1
-    fi
-}
-
-
 sincronizar_arquivos() {
     local CHECK="$1"
     local EXCLUDE_LIST="$2"
@@ -60,12 +32,28 @@ sincronizar_arquivos() {
 
     for item in "$ORIGEM"/*; do
 
-        
-
         nome_item=$(basename "$item")
         backup="$BACKUP${item#$ORIGEM}"
 
-        if [[ "$item" == "$ORIGEM" ]]; then
+        relative_backup=${backup#"$(dirname $BACKUPOG)/"}
+        relative_item=${item#"$(dirname $ORIGEMOG)/"}
+
+        if [[ "$item" == "$ORIGEM/*" ]]
+        then 
+            continue
+        fi
+
+        if [[ ! -r "$item" ]]
+        then
+            echo "ERROR: "$relative_item" does not have reading permissions."
+            ((error_count++))
+            continue
+        fi
+
+        if [[ -e "$backup" && ! -w "$backup" ]]
+        then
+            echo "ERROR: "$relative_backup" does not have writing permissions."
+            ((error_count++))
             continue
         fi
 

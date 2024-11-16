@@ -4,6 +4,26 @@ sincronizar_arquivos() {
     # Loop para iterar sobre cada arquivo na diretoria origem - sem find
     for arquivo in "$ORIGEMOG"/*; do
         
+        relative_backup=${backup#"$(dirname $BACKUPOG)/"}
+        relative_item=${arquivo#"$(dirname $ORIGEMOG)/"}
+
+        if [[ "$arquivo" == "$ORIGEM/*" ]]
+        then 
+            continue
+        fi
+
+        if [[ ! -r "$arquivo" ]]
+        then
+            echo "ERROR: "$relative_item" does not have reading permissions.")
+            continue
+        fi
+
+        if [[ -e "$backup" && ! -w "$backup" ]]
+        then
+            echo "ERROR: "$relative_backup" does not have writing permissions."
+            continue
+        fi
+
         if [ -f "$arquivo" ]; then
             
             backup="$BACKUPOG${arquivo#$ORIGEMOG}"
