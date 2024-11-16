@@ -60,7 +60,6 @@ remover_arquivos_inexistentes() {
     local ORIGEM="$2"
     local BACKUP="$3"
 
-    # Procura arquivos no diretório de backup
     for item in "$BACKUP"/*
     do
     
@@ -69,7 +68,6 @@ remover_arquivos_inexistentes() {
             continue
         fi 
 
-        # Manipula o valor da variável arquivo para ser o caminho correspondente na origem
         origem="$ORIGEM/${item#$BACKUP/}"
 
         if [[ -d "$item" ]]
@@ -80,7 +78,7 @@ remover_arquivos_inexistentes() {
                 then
                     rm -rf "$item"
                 fi
-                echo "rm -rf ${item#"$(dirname $BACKUPOG)/"}"
+
                 continue
             fi
 
@@ -93,7 +91,6 @@ remover_arquivos_inexistentes() {
                 then
                     rm "$item"
                 fi
-                echo "rm ${item#"$(dirname $BACKUPOG)/"}"
             fi
         fi
     done
