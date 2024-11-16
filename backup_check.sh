@@ -16,6 +16,9 @@ check_files() {
         # Manipula o valor da variavel item para ser o caminho do backup
         backup="$BACKUP${item#$ORIGEM}"         # Usamos parametros de expansao para trocar o caminho do item pelo caminho do backup
 
+        relative_item="testes/${item#$ORIGEM/}"
+        relative_backup="backup/${item#$ORIGEM/}"
+
         # Verifica se o ficheiro existe ou o item é mais recente que o backup
         if [[ -d "$item" ]]; then      # Verifica se o item é uma diretoria
             if [[ -d "$backup" ]]; then
@@ -23,7 +26,7 @@ check_files() {
                 check_files "$item" "$backup"
             else 
                 # nao existe
-                echo "Directory $backup does not exist"
+                echo "Directory $relative_backup does not exist"
             fi
 
         elif [[ -f "$item" ]]; then
@@ -33,11 +36,11 @@ check_files() {
 
                 if [[ "$source_check" != "$backup_check" ]]; then                     # aqui verificamos se o hash do item é diferente ao do seu backup
                     # diferem
-                    echo "File $item and $backup differ"
+                    echo "File $relative_item and $relative_backup differ"
                 fi 
             else
                 # nao existe
-                echo "File $backup does not exist"
+                echo "File $relative_backup does not exist"
             fi   
         fi
     done
