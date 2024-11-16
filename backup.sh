@@ -97,13 +97,11 @@ remover_arquivos_inexistentes() {
 }
 
 
-
-
-CHECK=false                             # Check vai ser o valor booleano que indica se o utilizador pretende fazer "checking" do backup
+CHECK=false                          
 EXCLUDE_LIST=""
 REGEX=""
-excluded_files=()                       # inicializa a lista de ficheiros a excluir
-                                        # : atrás é uma convenção usada para lidar com erros em bash de forma efetiva
+excluded_files=()                       
+                                        # ':'' atrás é uma convenção usada para lidar com erros em bash de forma efetiva
                                         # todos os comandos seguido de um : indica que recebe argumentos
 while getopts ":cb:r:" opt              # getopts é uma utilidade built in que simplifica parsing flags
 do
@@ -125,27 +123,25 @@ fi
 ORIGEMOG="$1"
 BACKUPOG="$2"
 
-# Verifica se a origem não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$ORIGEMOG" ]
 then
     echo "$1 is not a directory"
     exit 1
 fi
 
-# Verifica se o backup não é uma diretoria e consequencialmente se não existe
 if [ ! -d "$BACKUPOG" ]
 then
     if [[ "$CHECK" == false ]]
     then
-        mkdir -p "$BACKUPOG"      # Cria a diretoria. Caso as diretorias 'acima' não existam, estas serão criadas também
+        mkdir -p "$BACKUPOG"   
     fi
     echo "mkdir ${BACKUPOG#"$(dirname $BACKUPOG)/"}"
 fi
 
-# Verifica as permissões (escrita no backup e leitura na origem)
+
 if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEMOG" ]) && [[ $CHECK == false ]]
 then
-    echo "Check the writing permissions on the backup directory or the reading permissions from the source"
+    echo "Error in permissions"
     exit 2
 fi
 
