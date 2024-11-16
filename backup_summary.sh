@@ -1,12 +1,12 @@
 #!/bin/bash
 
-error_count=0
-warning_count=0
-update_count=0
-copy_count=0
-delete_count=0
-copied_size=0
-deleted_size=0
+#error_count=0
+#warning_count=0
+#update_count=0
+#copy_count=0
+#delete_count=0
+#copied_size=0
+#deleted_size=0
 
 usage() {
     echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
@@ -53,15 +53,9 @@ verificar_condicoes() {
         ((error_count++))
     fi
 
-    # Verificar se a lista de exclusão existe, se especificada
-    if [[ -n "$EXCLUDE_LIST" && ! -f "$EXCLUDE_LIST" ]]; then
-        echo "Error: Exclude list file '$EXCLUDE_LIST' does not exist."
-        ((error_count++))
-    fi
-
     # Verificar se há erros no final das verificações
     if [[ $error_count -gt 0 ]]; then
-        echo "Total errors detected: $error_count. Exiting."
+        exibir_warnings "$ORIGEM"
         exit 1
     fi
 }
@@ -140,12 +134,12 @@ remover_arquivos_inexistentes() {
     local ORIGEM="$2"
     local BACKUP="$3"
 
-    local error_count=0
-    local warning_count=0
-    local update_count=0
-    local copy_count=0
+    #local error_count=0
+    #local warning_count=0
+    #local update_count=0
+    #local copy_count=0
     local delete_count=0
-    local copied_size=0
+    #local copied_size=0
     local deleted_size=0
 
 
@@ -211,6 +205,8 @@ BACKUPOG="$2"
 
 if [ ! -d "$ORIGEMOG" ]; then
     echo "$1 is not a directory"
+    ((error_count++))
+    exibir_warnings "$ORIGEM"
     exit 1
 fi
 
@@ -221,8 +217,11 @@ if [ ! -d "$BACKUPOG" ]; then
     echo "mkdir ${BACKUPOG#"$(dirname $BACKUPOG)/"}"
 fi
 
+
 if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEMOG" ]) && [[ $CHECK == false ]]; then
     echo "Check the writing permissions on the backup directory or the reading permissions from the source"
+    ((error_count++))
+    exibir_warnings "$ORIGEM"
     exit 2
 fi
 
@@ -231,6 +230,7 @@ if [[ -n "$EXCLUDE_LIST" ]]; then
         excluded_files+=("$line")
     done < "$EXCLUDE_LIST"
 fi
+
 
 sincronizar_arquivos "$CHECK" "$EXCLUDE_LIST" "$REGEX" "$ORIGEMOG" "$BACKUPOG"
 if [[ -e "$BACKUPOG" ]]; then
