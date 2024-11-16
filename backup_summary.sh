@@ -8,29 +8,19 @@ usage() {
 exibir_warnings() {
     local dir_path="$1"
     local relative_path="${dir_path#"$ORIGEMOG"}"  # Remove o prefixo da origem
+    if [[ -z "$relative_path" ]]; then
+        relative_path=$(basename "$ORIGEMOG")  # Usa o nome da origem se o caminho relativo for vazio
+    fi
     echo "While backuping ${relative_path#/}: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ($copied_size B); $delete_count Deleted ($deleted_size B)"
     echo ""
 }
+
 
 verificar_condicoes() {
     # Verificar se o diretório origem existe
     if [ ! -d "$ORIGEMOG" ]; then
         echo "Error: Source directory '$ORIGEMOG' does not exist."
         ((error_count++))
-    fi
-
-    # Verificar se o diretório de backup é válido
-    if [ ! -d "$BACKUPOG" ]; then
-        echo "Error: Backup directory '$BACKUPOG' does not exist. Creating it."
-        if [[ "$CHECK" == false ]]; then
-            mkdir -p "$BACKUPOG"
-            if [ $? -ne 0 ]; then
-                echo "Error: Failed to create backup directory '$BACKUPOG'."
-                ((error_count++))
-            fi
-        else
-            ((error_count++))
-        fi
     fi
 
     # Verificar permissões de escrita no backup
@@ -69,6 +59,9 @@ sincronizar_arquivos() {
     local deleted_size=0
 
     for item in "$ORIGEM"/*; do
+
+        
+
         nome_item=$(basename "$item")
         backup="$BACKUP${item#$ORIGEM}"
 
