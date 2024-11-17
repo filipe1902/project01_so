@@ -14,7 +14,7 @@ sincronizar_arquivos() {
 
         if [[ ! -r "$arquivo" ]]
         then
-            echo "ERROR: "$relative_item" does not have reading permissions.")
+            echo "ERROR: "$relative_item" does not have reading permissions."
             continue
         fi
 
@@ -54,14 +54,6 @@ remover_arquivos_inexistentes() {
             fi
         fi
     done
-
-    # Loop para iterar sobre cada diretoria na diretoria backup
-    for dir in "$BACKUPOG"/*; do
-        if [ -d "$dir" ] && [ -z "$(ls -A "$dir")" ]; then
-            rmdir "$dir"  
-            echo "rm ${arquivo#"$(dirname "$BACKUPOG")/"}"
-        fi
-    done
 }
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
@@ -97,6 +89,7 @@ if [ ! -d "$BACKUPOG" ]; then
 fi
 
 if ([ ! -w "$BACKUPOG" ] || [ ! -r "$ORIGEMOG" ]) && [[ $CHECK == false ]]; then
+    echo "ERROR: Check "$ORIGEMOG" reading permissions or "$BACKUPOG" writing permissions"
     exit 2
 fi
 
