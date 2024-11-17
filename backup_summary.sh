@@ -16,9 +16,6 @@ exibir_warnings() {
 }
 
 sincronizar_arquivos() {
-    local CHECK="$1"
-    local EXCLUDE_LIST="$2"
-    local REGEX="$3"
     local ORIGEM="$4"
     local BACKUP="$5"
 
