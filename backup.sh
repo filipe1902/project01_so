@@ -68,7 +68,7 @@ sincronizar_arquivos() {
         if [[ -n "$REGEX" ]] && ! echo "$nome_item" | grep -qE "$REGEX"; then
             continue
         fi
-“$ORIGEM”/*.
+
         if [[ -d "$item" ]]; then
             if [[ ! -d "$backup" ]]; then
                 if [[ "$CHECK" == false ]]; then
