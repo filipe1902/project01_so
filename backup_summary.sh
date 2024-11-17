@@ -10,10 +10,8 @@ exibir_warnings() {
     local relative_path="${dir_path#$ORIGEMOG}"
 
     relative_path=$(basename "$ORIGEMOG")$relative_path
-
     relative_path=${relative_path#/}
 
-    # Exibe a mensagem formatada
     echo "While backuping $relative_path: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
 }
 
@@ -83,7 +81,7 @@ sincronizar_arquivos() {
                 echo "WARNING: backup entry $backup is newer than $item; Should not happen"
                 ((warning_count++))
             fi
-#o problema começa aqui
+
             if [[ ! -e "$backup" ]] || [[ "$item" -nt "$backup" ]]; then
                 if [[ ! -e "$backup" ]]; then
                     ((copy_count++))
@@ -102,7 +100,7 @@ sincronizar_arquivos() {
             fi
         fi
     done
-#o problema acaba aqui
+
     exibir_warnings "$ORIGEM"
 }
 
@@ -111,12 +109,7 @@ remover_arquivos_inexistentes() {
     local ORIGEM="$2"
     local BACKUP="$3"
 
-    #local error_count=0
-    #local warning_count=0
-    #local update_count=0
-    #local copy_count=0
     local delete_count=0
-    #local copied_size=0
     local deleted_size=0
 
 
@@ -130,8 +123,8 @@ remover_arquivos_inexistentes() {
                 fi
                 echo "rm -rf ${item#"$(dirname $BACKUPOG)/"}"
                 ((delete_count++))
-                deleted_size=$((deleted_size + $(du -sb "$item" | cut -f1)))  # Soma o tamanho da diretoria
-                #exibir_warnings "$ORIGEM"
+                deleted_size=$((deleted_size + $(du -sb "$item" | cut -f1)))  
+
                 continue
             fi
 
@@ -143,7 +136,7 @@ remover_arquivos_inexistentes() {
                 if [[ "$CHECK" == false ]]; then
                     rm "$item"
                 fi
-                #echo "rm ${item#"$(dirname $BACKUPOG)/"}"
+
                 ((delete_count++))
                 deleted_size=$((deleted_size + file_size))
             fi

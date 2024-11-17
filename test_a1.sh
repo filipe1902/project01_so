@@ -8,7 +8,7 @@ rm -rf backup_test
 cp -r -a backup_$testName backup_test
 
 #test results
-./backup.sh src backup_test > output.txt 2> err.txt
+./backup_summary.sh src backup_test > output.txt 2> err.txt
 
 nlinesout=$(wc -l ${testName}.out | cut -d\  -f1)
 
