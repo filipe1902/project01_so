@@ -50,7 +50,6 @@ remover_arquivos_inexistentes() {
                 if [[ "$CHECK" == false ]]; then
                     rm "$arquivo"  
                 fi
-                echo "rm ${arquivo#"$(dirname "$BACKUPOG")/"}"
             fi
         fi
     done

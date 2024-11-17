@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: $0 <source_directory> <backup_directory>"
+    echo "Usage: $0 [-c] [-b tfile] [-r regexpr] <source_directory> <backup_directory>"
     exit 1
 }
 
@@ -42,8 +42,6 @@ sincronizar_arquivos() {
             fi
         done
         
-
-
         # Verifica a expressão regular se estiver definida
         if [[ -n "$REGEX" ]] && ! echo "$nome_item" | grep -qE "$REGEX"; then
             continue   
