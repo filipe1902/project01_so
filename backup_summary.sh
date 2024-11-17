@@ -83,24 +83,26 @@ sincronizar_arquivos() {
                 echo "WARNING: backup entry $backup is newer than $item; Should not happen"
                 ((warning_count++))
             fi
-
+#o problema começa aqui
             if [[ ! -e "$backup" ]] || [[ "$item" -nt "$backup" ]]; then
                 if [[ ! -e "$backup" ]]; then
                     ((copy_count++))
+                    file_size=$(stat -c%s "$item")
+                    copied_size=$((copied_size + file_size))
                 else
                     ((update_count++))
                 fi
-                file_size=$(stat -c%s "$item")
+                
                 if [[ "$CHECK" == false ]]; then
                     cp -a "$item" "$backup"
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
 
-                copied_size=$((copied_size + file_size))
+
             fi
         fi
     done
-
+#o problema acaba aqui
     exibir_warnings "$ORIGEM"
 }
 
