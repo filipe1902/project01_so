@@ -7,11 +7,14 @@ usage() {
 
 exibir_warnings() {
     local dir_path="$1"
-    local relative_path="${dir_path#"$ORIGEMOG"}"  # Remove o prefixo da origem
-    if [[ -z "$relative_path" ]]; then
-        relative_path=$(basename "$ORIGEMOG")  # Usa o nome da origem se o caminho relativo for vazio
-    fi
-    echo "While backuping ${relative_paht#/}: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
+    local relative_path="${dir_path#$ORIGEMOG}"
+
+    relative_path=$(basename "$ORIGEMOG")$relative_path
+
+    relative_path=${relative_path#/}
+
+    # Exibe a mensagem formatada
+    echo "While backuping $relative_path: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
 }
 
 sincronizar_arquivos() {

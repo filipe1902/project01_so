@@ -7,8 +7,14 @@ usage() {
 
 exibir_warnings() {
     local dir_path="$1"
-    
-    echo "While backuping $dir_path: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
+    local relative_path="${dir_path#$ORIGEMOG}"
+
+    relative_path=$(basename "$ORIGEMOG")$relative_path
+
+    relative_path=${relative_path#/}
+
+    # Exibe a mensagem formatada
+    echo "While backuping $relative_path: $error_count Errors; $warning_count Warnings; $update_count Updated; $copy_count Copied ("$copied_size"B); $delete_count Deleted ("$deleted_size"B)"
 }
 
 sincronizar_arquivos() {
@@ -77,24 +83,27 @@ sincronizar_arquivos() {
                 echo "WARNING: backup entry $backup is newer than $item; Should not happen"
                 ((warning_count++))
             fi
-
+#o problema começa aqui
             if [[ ! -e "$backup" ]] || [[ "$item" -nt "$backup" ]]; then
                 if [[ ! -e "$backup" ]]; then
                     ((copy_count++))
                 else
                     ((update_count++))
                 fi
-                file_size=$(stat -c%s $"item")
+                file_size=$(stat -c%s "$item")
+                #echo $file_size
                 if [[ "$CHECK" == false ]]; then
                     cp -a "$item" "$backup"
                 fi
                 echo "cp -a ${item#"$(dirname $ORIGEMOG)/"} ${backup#"$(dirname $BACKUPOG)/"}"
-
-                copied_size=$((copied_size + file_size))
+                copied_size=$((file_size))
+                #copied_size=$((copied_size + file_size))
+                #echo $copied_size
+                #echo $file_size
             fi
         fi
     done
-
+#o problema acaba aqui
     exibir_warnings "$ORIGEM"
 }
 
