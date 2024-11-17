@@ -194,6 +194,7 @@ fi
 
 if [[ -n "$EXCLUDE_LIST" ]]; then
     while IFS= read -r line; do
+        line=$(echo "$line" | xargs)
         excluded_files+=("$line")
     done < "$EXCLUDE_LIST"
 fi
